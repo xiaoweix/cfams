@@ -1,0 +1,150 @@
+<template>
+  <div>
+    <SubTitle :subTitle="subTitle"/>
+    <el-button type="primary"
+               style="position: absolute; top: 70px; right: 20px"
+               @click="dialogAssetAdd = true">资产补货</el-button>
+    <el-form ref="warehousing"
+             :model="warehousing"
+             label-width="80px"
+             class="warehousingForm">
+      <el-form-item label="资产名称">
+        <el-input v-model="warehousing.name"></el-input>
+      </el-form-item>
+      <el-form-item label="品牌型号">
+        <el-input v-model="warehousing.model"></el-input>
+      </el-form-item>
+      <el-form-item label="生产商">
+        <el-input v-model="warehousing.factory"></el-input>
+      </el-form-item>
+      <el-form-item label="采购价格">
+        <el-input v-model="warehousing.price"></el-input>
+      </el-form-item>
+      <el-form-item label="资产寿命">
+        <el-input v-model="warehousing.age"></el-input>
+      </el-form-item>
+      <el-form-item label="采购数量">
+        <el-input v-model="warehousing.name"></el-input>
+      </el-form-item>
+      <el-form-item label="类型">
+        <div class="row">
+          <el-select v-model="warehousing.type">
+            <el-option label="数码产品" value="shanghai"></el-option>
+            <el-option label="电子产品" value="beijing"></el-option>
+            <el-option label="办公用具" value="shanghai"></el-option>
+            <el-option label="家具" value="beijing"></el-option>
+          </el-select>
+          <div>没有想要的类型？点击
+            <el-link type="primary" @click.native="addType = true"> 添加类型 </el-link>
+          </div>
+        </div>
+      </el-form-item>
+      <el-form-item label="资源权限">
+        <template>
+          <el-radio v-model="warehousing.power" label="1">不可见</el-radio>
+          <el-radio v-model="warehousing.power" label="2">可借</el-radio>
+          <el-radio v-model="warehousing.power" label="2">可领</el-radio>
+        </template>
+      </el-form-item>
+      <el-form-item label="上传图片">
+        <el-image
+          style="width: 100px; height: 100px"
+          :src="warehousing.pic1"></el-image>
+        <el-image
+          style="width: 100px; height: 100px"
+          :src="warehousing.pic2"></el-image>
+        <el-image
+          style="width: 100px; height: 100px"
+          :src="warehousing.pic3"></el-image>
+      </el-form-item>
+      <el-form-item label="备注">
+        <el-input type="textarea" v-model="warehousing.remarks"></el-input>
+      </el-form-item>
+      <el-form-item style="margin-top: 10px" class="row justify-between">
+        <el-button> 取消 </el-button>
+        <el-button type="primary">确定</el-button>
+      </el-form-item>
+    </el-form>
+    <!--弹框-->
+    <el-dialog title="收货地址"
+               :visible.sync="dialogAssetAdd"
+               :modal-append-to-body="false">
+      <el-form :model="queryAsset" :inline="true">
+        <el-form-item label="资产名" label-width="100">
+          <el-input v-model="queryAsset.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-button type="primary"> 查询 </el-button>
+      </el-form>
+      <el-table :data="queryList">
+        <el-table-column property="id" label="资产ID"></el-table-column>
+        <el-table-column property="name" label="资产名"></el-table-column>
+        <el-table-column property="model" label="型号"></el-table-column>
+        <el-table-column property="own" label="剩余"></el-table-column>
+      </el-table>
+      <div class="text-h5 q-pt-md q-pb-lg">您选择的是 1003 订书机   E123</div>
+      <div class="row">
+        <div class="text-h6 q-pr-lg">采购数量</div>
+        <el-input v-model="needCount" autocomplete="off" style="width: 100px"></el-input>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogAssetAdd = false">取 消</el-button>
+        <el-button type="primary" @click="dialogAssetAdd = false">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog :visible.sync="addType"
+               width="25%"
+               top="30vh"
+               :modal-append-to-body="false">
+      <div class="row">
+        <div class="text-h6 q-pr-lg">类型名</div>
+        <el-input v-model="typeName" autocomplete="off" style="width: 100px"></el-input>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addType = false">取 消</el-button>
+        <el-button type="primary" @click="addType = false">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import SubTitle from "components/common/SubTitle";
+  export default {
+    name: "Warehousing",
+    data() {
+      return {
+        subTitle: '资产入库',
+        dialogAssetAdd: false,
+        queryAsset: {},
+        queryList: [{
+          id: '1003',
+          name: '订书机',
+          model: 'E103',
+          own: '0'
+        }],
+        needCount: '',
+        addType: false,
+        warehousing: {},
+        typeName: '电脑'
+      }
+    },
+    components: {
+      SubTitle
+    }
+  }
+</script>
+
+<style scoped lang="sass">
+.warehousingForm
+  width: 420px
+  margin-top: 10px
+  margin-left: 200px
+.el-form-item
+  margin: 0
+  padding: 0
+/deep/.el-input .el-input__inner
+  height: 32px
+/deep/.el-select
+  width: 120px
+  margin-right: 20px
+</style>
