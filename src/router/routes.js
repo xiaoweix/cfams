@@ -3,11 +3,16 @@ const ForgetPwd = () => import("pages/forgetPwd/ForgetPwd")
 const Register = () => import("pages/register/Register")
 const Main = () => import("layouts/MainLayout")
 const AssetProfile = () => import("pages/assetProfile/AssetProfile")
-const AssetsList = () => import("pages/assetManager/assetList/AssetList")
-const Warehousing = () => import("pages/assetManager/assetWarehousing/Warehousing")
-const AssetUseHistory = () => import("pages/assetManager/assetUseHietory/AssetUseHistory")
+const AssetsList = () => import("pages/assetManage/assetList/AssetList")
+const Warehousing = () => import("pages/assetManage/assetWarehousing/Warehousing")
+const AssetUseHistory = () => import("pages/assetManage/assetUseHietory/AssetUseHistory")
 const Profile = () => import("pages/profile/Profile")
 const Warehouse = () => import("pages/warehouse/Warehouse")
+const UserList = () => import("pages/userManage/userList/UserList")
+const AddUser= () => import("pages/userManage/addUser/AddUser")
+const AssetMap = () => import("pages/asetMap/AssetMap")
+const InfoList = () => import("pages/logManage/infoList/InfoList")
+const LotLog = () => import("pages/logManage/lotLog/LotLog")
 
 const routes = [
   {
@@ -54,7 +59,27 @@ const routes = [
       {
         path: 'warehouse',
         component: Warehouse
-      }
+      },
+      {
+        path: 'user-list',
+        component: UserList
+      },
+      {
+        path: 'add-user',
+        component: AddUser
+      },
+      {
+        path: 'asset-map',
+        component: AssetMap
+      },
+      {
+        path: 'lot-log',
+        component: LotLog
+      },
+      {
+        path: 'info-list',
+        component: InfoList
+      },
     ]
   }
 ]

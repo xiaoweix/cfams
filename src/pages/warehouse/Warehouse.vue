@@ -56,18 +56,18 @@
     </div>
 
     <!--对话框-->
-    <el-dialog
-      title="提示"
-      :visible.sync="dialogDelete"
-      :modal-append-to-body="false"
-      top="120px"
-      width="30%">
-      <span>确认删除吗？</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogDelete = false">取 消</el-button>
-        <el-button type="primary" @click="sureDelete()">确 定</el-button>
-      </span>
-    </el-dialog>
+      <el-dialog
+        title="提示"
+        :visible.sync="dialogDelete"
+        :modal-append-to-body="false"
+        top="120px"
+        width="30%">
+        <span>确认删除吗？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogDelete = false">取 消</el-button>
+          <el-button type="primary" @click="sureDelete()">确 定</el-button>
+        </span>
+      </el-dialog>
     <el-dialog
       title="编辑仓库"
       :visible.sync="dialogView"

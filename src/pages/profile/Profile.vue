@@ -1,10 +1,10 @@
 <template>
   <div class="my-profile">
     <SubTitle :subTitle="subTitle"/>
-    <el-link class="edit-profile" type="primary">编辑资料</el-link>
-    <el-form :model="profile" label-width="80px" disabled="true">
+    <el-link class="edit-profile" type="primary" @click="editForm">编辑资料</el-link>
+    <el-form :model="profile" label-width="80px" :disabled="formDisabled">
       <el-form-item label="姓名">
-        <el-input v-model="profile.name"></el-input>
+        <el-input v-model="profile.name" disabled="true"></el-input>
       </el-form-item>
 
       <el-form-item label="手机">
@@ -56,6 +56,7 @@
     data() {
       return {
         subTitle: '个人中心',
+        formDisabled: true,
         profile: {
           name: 'zhangsan '
         }
@@ -65,6 +66,9 @@
       SubTitle
     },
     methods: {
+      editForm() {
+        this.formDisabled = false
+      }
     }
   }
 </script>
