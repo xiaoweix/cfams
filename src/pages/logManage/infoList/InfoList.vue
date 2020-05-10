@@ -74,7 +74,7 @@
         <el-table-column
           label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="true">同意</el-button>
+            <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="scope.row.isDeal">同意</el-button>
             <el-button type="text" size="small" @click="handleReject(scope.row, scope.row.isDeal)" :disabled="scope.row.isDeal">拒绝</el-button>
             <el-button @click="handleDisagree(scope.row)" type="text" size="small">申请详情</el-button>
           </template>
@@ -178,7 +178,7 @@
             }
           })
       },
-      handleAgree(row, ff) {
+      handleAgree(row) {
         this.$get('/asset_manage/apply/agreeApply', {
           applyId: row.id
         })
@@ -189,16 +189,9 @@
               icon: 'cloud_done',
               message: data.msg
             })
-            for(let i = 0; i < this.infoList.length; i++) {
-              if (this.infoList[i].result == '同意' || this.infoList[i].result == '拒绝') {
-                this.infoList[i].isDeal = true;
-              } else {
-                this.infoList[i].isDeal = false;
-              }
-            }
           })
       },
-      handleReject(row, ff) {
+      handleReject(row) {
         this.$get('/asset_manage/apply/disagreeApply', {
           applyId: row.id
         })
