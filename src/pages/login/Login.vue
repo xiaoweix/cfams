@@ -9,9 +9,9 @@
       <q-input
         filled
         v-model="account"
-        label="请输入您的手机号或邮箱 *"
+        label="请输入您的邮箱 *"
         lazy-rules
-        :rules="[ val => val && val.length > 0 || '请输入正确的手机号或者邮箱']"
+        :rules="[ val => val && val.length > 0 || '请输入正确的邮箱']"
       />
 
       <q-input
@@ -26,6 +26,8 @@
       />
 
       <div class="forgetPsd" @click="$router.push('/forget-password')">忘记密码</div>
+      <br>
+      <div class="forgetPsd" @click="$router.push('/register')">注册</div>
 
       <div>
         <q-btn label="登录" type="submit" color="primary"/>
@@ -37,6 +39,8 @@
 
 <script>
 import Title from 'components/common/Title'
+import { mapMutations } from 'vuex'
+
 export default {
   name: "Login",
   data() {
@@ -49,8 +53,37 @@ export default {
     Title
   },
   methods: {
+    ...mapMutations(['changeLogin']),
     onLogin() {
-      console.log('pppp')
+      const email = this.account
+      const password = this.password
+      this.$get('/login', { email,password })
+        .then(res => {
+          this.$router.push({ path: '/main', query: { email } })
+          this.userToken = res.result.token
+          this.userEmail = email
+          this.userCode = res.result.code
+          // 将用户token保存到vuex中
+          this.changeLogin({
+            token: this.userToken,
+            userEmail: this.userEmail,
+            userCode: this.userCode
+          })
+          this.$q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: '登录成功'
+          })
+        })
+        .catch(err => {
+          this.$q.notify({
+            color: 'red-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: '登录名或密码错误'
+          })
+        })
     }
   }
 }

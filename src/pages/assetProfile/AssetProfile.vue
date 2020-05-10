@@ -25,16 +25,21 @@
         subTitle: '资产概况',
         allColor: '#FFDF25',
         allTitle: '资产总数量',
-        allNum: '1234',
+        allNum: '',
         useColor: '#36A9CE',
         useTitle: '投入使用的资源数量',
-        useNum: '567',
+        useNum: '',
         borrowColor: '#D0E17D',
         borrowTitle: '出借资源数量',
-        borrowNum: '234',
+        borrowNum: '',
         badColor: '#EF5AA1',
         badTitle: '损坏资源数量',
-        badNum: '20'
+        badNum: '',
+        pieData: [],
+        xBarData: [],
+        yBarData: [],
+        xLineData: [],
+        yLineData: []
       }
     },
     components: {
@@ -42,9 +47,41 @@
       SpecificAsset
     },
     mounted(){
-      this.drawPie();
-      this.drawBar();
-      this.drawLine();
+    },
+    created() {
+      this.$get('/asset_manage/dataVisible/index')
+        .then(data => {
+          let res = data.result;
+          this.badNum = res.assetDamageNum.toString();
+          this.useNum = res.assetInUse.toString();
+          this.borrowNum = res.lendAssetNum.toString();
+          this.allNum = res.assetSum.toString();
+          const { assetUseLend, assetUseReceive, assetUseConstant, assetUserRepair } = res
+          this.pieData = [
+            {value: assetUseLend, name: '借用'},
+            {value: assetUseReceive, name: '领用'},
+            {value: assetUserRepair, name: '维修'},
+            {value: assetUseConstant, name: '固定使用'}
+          ]
+          for(let i = 0; i < res.assetLendRankList.length; i++) {
+            this.xBarData.push(res.assetLendRankList[i].assetName)
+            this.yBarData.push(res.assetLendRankList[i].assetNum)
+          }
+          if(res.assetUseHalfYearBOList) {
+            for(let i = 0; i < res.assetUseHalfYearBOList.length; i++) {
+              this.xLineData.push(res.assetUseHalfYearBOList[i].assetName)
+              this.yLineData.push(res.assetUseHalfYearBOList[i].assetNum)
+            }
+            this.drawLine();
+          } else {
+            let halfYearDiv = document.getElementById('halfYearUse')
+            let pDiv = document.getElementById('asset-profile')
+            pDiv.removeChild(halfYearDiv)
+          }
+          this.drawPie();
+          this.drawBar();
+
+        })
     },
     methods: {
       drawPie() {
@@ -77,12 +114,7 @@
                 position: 'inside',
                 formatter: '{b}: {d}%'
               },
-              data: [
-                {value: 25, name: '借用'},
-                {value: 25, name: '领用'},
-                {value: 25, name: '维修'},
-                {value: 25, name: '固定使用'}
-              ],
+              data: this.pieData,
               emphasis: {
                 itemStyle: {
                   shadowBlur: 10,
@@ -114,7 +146,7 @@
           xAxis: [
             {
               type: 'category',
-              data: ['照相机', '摄像机', '指纹录入器', 'ID识别器', '单片机'],
+              data: this.xBarData,
               axisTick: {
                 alignWithLabel: true
               }
@@ -129,7 +161,7 @@
             {
               type: 'bar',
               barWidth: '40%',
-              data: [25, 10, 25, 2, 14]
+              data: this.yBarData
             }
           ]
         })
@@ -142,13 +174,13 @@
           },
           xAxis: {
             type: 'category',
-            data: ['2019.09', '2019.10', '2019.11', '2019.12', '2020.01', '2020.02']
+            data: xLineData
           },
           yAxis: {
             type: 'value'
           },
           series: [{
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            data: yLileData,
             type: 'line',
             smooth: true
           }]

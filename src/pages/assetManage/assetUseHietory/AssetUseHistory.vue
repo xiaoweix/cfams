@@ -14,11 +14,11 @@
         </el-form-item>
         <el-form-item label="类型">
           <el-select v-model="queryList.status">
-            <el-option label="领用" value="shanghai"></el-option>
-            <el-option label="使用" value="beijing"></el-option>
-            <el-option label="借用" value="shanghai"></el-option>
-            <el-option label="维修" value="beijing"></el-option>
-            <el-option label="报废" value="shanghai"></el-option>
+            <el-option label="领用" value="领用"></el-option>
+            <el-option label="使用" value="使用"></el-option>
+            <el-option label="借用" value="借用"></el-option>
+            <el-option label="维修" value="维修"></el-option>
+            <el-option label="报废" value="报废"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -33,7 +33,7 @@
         style="width: 100%">
         <el-table-column
           fixed
-          prop="assetId"
+          prop="id"
           label="资产编号"
           width="120">
         </el-table-column>
@@ -42,7 +42,7 @@
           label="资产名">
         </el-table-column>
         <el-table-column
-          prop="user"
+          prop="userName"
           label="使用人">
         </el-table-column>
         <el-table-column
@@ -50,11 +50,7 @@
           label="开始时间">
         </el-table-column>
         <el-table-column
-          prop="useTime"
-          label="使用时间">
-        </el-table-column>
-        <el-table-column
-          prop="assetType"
+          prop="applyType"
           label="类型">
         </el-table-column>
         <el-table-column
@@ -74,7 +70,7 @@
                title="资产使用详情">
       <el-form :model="assetDetail" label-width="120px">
         <el-form-item label="资产名">
-          <el-input v-model="assetDetail.name"></el-input>
+          <el-input v-model="assetDetail.assetName"></el-input>
         </el-form-item>
         <el-form-item label="资产型号">
           <el-input v-model="assetDetail.model"></el-input>
@@ -119,20 +115,32 @@
         subTitle: '资产使用历史',
         dialogView: false,
         queryList: {},
-        assetList: [
-          {
-            assetId: '1001',
-          }
-        ],
+        assetList: [],
         assetDetail: {}
       }
+    },
+    created() {
+      this.getList()
     },
     components: {
       SubTitle
     },
     methods: {
+      onSubmit() {
+        this.getList()
+      },
       handleView(asset) {
         this.dialogView = true
+      },
+      getList() {
+        this.$get('/asset_manage/asset/getHistoryList', {
+          assetId: '',
+          assetName: '',
+          userName: '',
+          type: ''
+        }).then(data => {
+          this.assetList = data.result
+        })
       }
     }
   }

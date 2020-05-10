@@ -65,12 +65,54 @@
   import Title from "components/common/Title";
   export default {
     name: "Register",
+    data() {
+      return {
+        nickname: '',
+        password: '',
+        mySay: '',
+        password2: '',
+        phone: '',
+        email: '',
+        code: ''
+      }
+    },
     components: {
       Title
     },
     methods: {
       onSubmit() {
-        console.log("注册成功")
+        this.$post('/register', {
+          email: this.email,
+          password: this.password,
+          telephone: this.phone,
+          signature: this.mySay,
+          userName: this.nickname
+        })
+          .then(data => {
+            if(data.code == 200) {
+              this.$q.notify({
+                color: 'green-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: data.msg
+              })
+            } else {
+              this.$q.notify({
+                color: 'red-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: data.msg
+              })
+            }
+          })
+          .catch(err => {
+            this.$q.notify({
+              color: 'red-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: err.msg
+            })
+          })
       }
     }
   }

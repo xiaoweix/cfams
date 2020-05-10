@@ -41,10 +41,14 @@
       <el-table :data="infoList" >
         <el-table-column
           prop="id"
+          label="申请ID">
+        </el-table-column>
+        <el-table-column
+          prop="assetId"
           label="资产编号">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="userName"
           label="申请人">
         </el-table-column>
         <el-table-column
@@ -52,24 +56,27 @@
           label="申请类型">
         </el-table-column>
         <el-table-column
-          prop="count"
+          prop="assetName"
+          label="资产名称">
+        </el-table-column>
+        <el-table-column
+          prop="number"
           label="申请数量">
         </el-table-column>
         <el-table-column
-          prop="time"
+          prop="startTime"
           label="申请时间">
         </el-table-column>
         <el-table-column
-          prop="status"
+          prop="result"
           label="状态">
         </el-table-column>
         <el-table-column
-          prop="count"
           label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleView(scope.row)" type="text" size="small">同意</el-button>
-            <el-button type="text" size="small" @click="dialogDelete = true">拒绝</el-button>
-            <el-button @click="handleView(scope.row)" type="text" size="small">申请详情</el-button>
+            <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="true">同意</el-button>
+            <el-button type="text" size="small" @click="dialogDelete = true" :disabled="scope.row.isDeal">拒绝</el-button>
+            <el-button @click="handleDisagree(scope.row)" type="text" size="small">申请详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -84,24 +91,112 @@
     data() {
       return {
         subTitle: '信息列表',
-        infoList: [
+        infoList: [],
+        levels: [
           {
-            id: '0002',
-            name: 'jello',
-            type: '借用',
-            count: 5,
-            time: '2018-09-09',
-            status: '待处理'
+            value: '1',
+            label: '普通学生用户'
+          },
+          {
+            value: '2',
+            label: '教师用户'
+          },
+          {
+            value: '3',
+            label: '管理员'
+          },
+          {
+            value: '4',
+            label: '超级管理员'
           }
         ],
-        queryList: {}
+        statuses: [
+          {
+            value: '1',
+            label: '正常'
+          },
+          {
+            value: '2',
+            label: '锁定'
+          },
+          {
+            value: '3',
+            label: '待处理'
+          }
+        ],
+        queryList: {},
+        isDeal: false
       }
     },
     components: {
       SubTitle
     },
+    created() {
+      this.getList()
+    },
     methods: {
-      onSubmit() {}
+      onSubmit() {
+        this.getList()
+      },
+      getList() {
+        let urgencyArr = [['1', '2', '3'], ['不急', '一般', '急用']]
+        let resultArr = [['0', '1', '2'], ['待处理', '同意', '拒绝']]
+        let typeArr = [['1', '2', '3', '4'], ['借用', '申领', '采购', '反馈']]
+        this.$get('/asset_manage/apply/assetLogList', {
+          assetId: this.queryList.id,
+          userName: this.queryList.name,
+          status: this.queryList.status,
+          telephone: this.queryList.phone,
+          jobLevel: this.queryList.level
+        })
+          .then(data => {
+            for(let i = 0; i < data.result.length; i++) {
+              for(let j = 0; j < urgencyArr[0].length; j++) {
+                if(urgencyArr[0][j] == data.result[i].urgency) {
+                  data.result[i].urgency = urgencyArr[1][j]
+                }
+              }
+              for(let j = 0; j < resultArr[0].length; j++) {
+                if(resultArr[0][j] == data.result[i].result) {
+                  data.result[i].result = resultArr[1][j]
+                }
+              }
+              for(let j = 0; j < typeArr[0].length; j++) {
+                if(typeArr[0][j] == data.result[i].type) {
+                  data.result[i].type = typeArr[1][j]
+                }
+              }
+            }
+            this.infoList = data.result;
+            for(let i = 0; i < data.result.length; i++) {
+              if(data.result[i].result == '同意' || data.result[i].result == '拒绝') {
+                data.result[i].isDeal = true;
+              } else {
+                data.result[i].isDeal = false;
+              }
+            }
+          })
+      },
+      handleAgree(row, ff) {
+        this.$get('/asset_manage/apply/agreeApply', {
+          applyId: row.id
+        })
+          .then(data => {
+            this.$q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
+            for(let i = 0; i < this.infoList.length; i++) {
+              if (this.infoList[i].result == '同意' || this.infoList[i].result == '拒绝') {
+                this.infoList[i].isDeal = true;
+              } else {
+                this.infoList[i].isDeal = false;
+              }
+            }
+          })
+      }
     }
   }
 </script>

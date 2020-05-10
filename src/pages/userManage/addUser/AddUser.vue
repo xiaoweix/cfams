@@ -4,10 +4,10 @@
     <div class="add-user-form">
       <el-form :model="addUserForm" label-width="80px">
         <el-form-item label="用户名">
-          <el-input v-model="addUserForm.name"></el-input>
+          <el-input v-model="addUserForm.userName"></el-input>
         </el-form-item>
         <el-form-item label="电话">
-          <el-input v-model="addUserForm.phone"></el-input>
+          <el-input v-model="addUserForm.telephone"></el-input>
         </el-form-item>
         <el-form-item label="电子邮箱">
           <el-input v-model="addUserForm.email"></el-input>
@@ -26,11 +26,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="个人签名">
-          <el-input  type="textarea" v-model="addUserForm.describe"></el-input>
+          <el-input  type="textarea" v-model="addUserForm.signature"></el-input>
         </el-form-item>
         <el-form-item class="row justify-between">
           <el-button>取消</el-button>
-          <el-button type="primary">确定</el-button>
+          <el-button type="primary" @click="addUser">确定</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -48,19 +48,19 @@
         statuses: [
           {
             value: 1,
-            label: '学生'
+            label: '普通学生用户'
           },
           {
             value: 2,
-            label: '教师'
+            label: '教师用户'
           },
           {
             value: 3,
-            label: '维修工'
+            label: '管理员'
           },
           {
             value: 4,
-            label: '管理员'
+            label: '超级管理员'
           }
         ],
         status: ''
@@ -68,6 +68,37 @@
     },
     components: {
       SubTitle
+    },
+    methods: {
+      addUser () {
+        let { email, password, signature, status, telephone, userName } = this.addUserForm
+        let jobLevels = [['1', '2', '3', '9'], ['普通学生用户', '教师用户', '管理员', '超级管理员']]
+        let jobLevel;
+        for(let i = 0; i < jobLevels[1].length; i++) {
+          if(jobLevel == jobLevels[1][i]) {
+            jobLevel = jobLevels[0][i]
+          }
+        }
+        this.$post('/asset_manage/user/addUser', {
+          email, password, signature, jobLevel, telephone, userName
+        })
+          .then(data => {
+            this.$q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
+          })
+          .catch(err => {
+            this.$q.notify({
+              color: 'red-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '服务器繁忙，稍后再试'
+            })
+          })
+      }
     }
   }
 </script>

@@ -22,15 +22,15 @@
     </div>
     <el-table :data="lotLogTable" >
       <el-table-column
-        prop="name"
+        prop="userName"
         label="操作人">
       </el-table-column>
       <el-table-column
-        prop="content"
+        prop="remarks"
         label="操作内容">
       </el-table-column>
       <el-table-column
-        prop="time"
+        prop="startTime"
         label="操作时间">
       </el-table-column>
     </el-table>
@@ -45,20 +45,53 @@
       return {
         subTitle: '操作日志',
         queryList: {},
-        lotLogTable: [
-          {
-            name: '胡丽霞',
-            content: '删除资源',
-            time: '2015-53-43'
-          }
-        ]
+        lotLogTable: []
       }
     },
     components: {
       SubTitle
     },
+    created() {
+      this.getList()
+    },
     methods: {
-      onSubmit() {}
+      onSubmit() {
+        this.getList()
+      },
+      getList () {
+        let dataFrom, dataEnd;
+        if(this.queryList.date) {
+          dataFrom = this.dateFormat(this.queryList.date[0])
+          dataEnd = this.dateFormat(this.queryList.date[1])
+        }
+        this.$get('/asset_manage/logInfo/assetLogList', {
+          currPage: 1,
+          pageSize: 20,
+          userName: this.queryList.name ? this.queryList.name : '',
+          dataFrom,
+          dataEnd
+        })
+          .then(data => {
+            for(let i = 0; i < data.result.length; i++) {
+              data.result[i].startTime = this.dateFormat(data.result[i].startTime)
+            }
+            this.lotLogTable = data.result
+          })
+      },
+      dateFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
+      }
     }
   }
 </script>

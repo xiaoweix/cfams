@@ -62,7 +62,7 @@
       </el-form-item>
       <el-form-item style="margin-top: 10px" class="row justify-between">
         <el-button> 取消 </el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button type="primary" @click="sureAdd">确定</el-button>
       </el-form-item>
     </el-form>
     <!--弹框-->
@@ -130,6 +130,21 @@
     },
     components: {
       SubTitle
+    },
+    created() {
+      // this.$get('')
+    },
+    methods: {
+      sureAdd() {
+        this.$post('/asset_manage/asset/addAsset', {
+          assetName: '',
+          assetNum: '',
+          image1: '',
+          image2: '',
+          image3: '',
+          life: ''
+        })
+      }
     }
   }
 </script>

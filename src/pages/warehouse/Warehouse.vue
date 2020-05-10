@@ -4,7 +4,7 @@
     <q-btn color="primary"
            text-color="white"
            label="新建仓库"
-           @click="dialogAdd = true"
+           @click="handleAddWarehouse"
            class="add-warehouse"/>
     <div class="query">
       <el-form :inline="true" :model="queryList" class="demo-form-inline">
@@ -37,11 +37,11 @@
           label="仓库所在地">
         </el-table-column>
         <el-table-column
-          prop="count"
+          prop="assetNum"
           label="仓库资源数">
         </el-table-column>
         <el-table-column
-          prop="time"
+          prop="createTime"
           label="创建时间">
         </el-table-column>
         <el-table-column
@@ -56,7 +56,7 @@
     </div>
 
     <!--对话框-->
-      <el-dialog
+    <el-dialog
         title="提示"
         :visible.sync="dialogDelete"
         :modal-append-to-body="false"
@@ -100,6 +100,15 @@
         <el-form-item label="仓库地点">
           <el-input v-model="currentRow.address" autocomplete="off"></el-input>
         </el-form-item>
+<!--        <el-form-item label="地图ID">-->
+<!--          <el-input v-model="currentRow.mapId" autocomplete="off"></el-input>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item label="管理员ID">-->
+<!--          <el-input v-model="currentRow.manageId" autocomplete="off"></el-input>-->
+<!--        </el-form-item>-->
+        <el-form-item label="备注">
+          <el-input v-model="currentRow.remarks" autocomplete="off"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogAdd = false">取 消</el-button>
@@ -122,30 +131,22 @@
         dialogView: false,
         dialogDelete: false,
         dialogAdd: false,
-        wareList: [
-          {
-            id: '1001',
-            name: '11楼仓库',
-            address: '科技楼11楼',
-            count: 5,
-            time: "2020-02-27"
-          },
-          {
-            id: '1007',
-            name: '11楼仓库',
-            address: '科技楼11楼',
-            count: 5,
-            time: "2020-02-27"
-          }
-        ]
+        wareList: []
       }
     },
     components: {
       SubTitle
     },
+    created() {
+      this.getWareList()
+    },
     methods: {
-      handleAddWarehouse() {},
-      onSubmit() {},
+      handleAddWarehouse() {
+        this.dialogAdd = true
+      },
+      onSubmit() {
+        this.getWareList()
+      },
       handleView (row) {
         this.dialogView = true
         this.currentRow.name = row.name
@@ -164,11 +165,58 @@
             return this.wareList
           }
         }
+        this.$get('/asset_manage/warehouse/removeWarehouse', {
+          warehouseId: id
+        })
         this.dialogDelete = false
       },
       sureAdd () {
         this.wareList.push(this.currentRow)
+        this.$post('/asset_manage/warehouse/addWarehouse', {
+          name: this.currentRow.name,
+          address: this.currentRow.name,
+          // mapId: this.currentRow.mapId,
+          // manageId: this.currentRow.manageId,
+          manageId: 0,
+          remarks: this.currentRow.remarks
+        })
+          .then(data => {
+            console.log(data);
+          })
+          .catch(err => {
+            console.log(err);
+          })
         this.dialogAdd = false
+      },
+      getWareList() {
+        this.$get('/asset_manage/warehouse/warehouseList', {
+          currPage: 1,
+          pageSize: 50,
+          warehouseName: this.queryList.warehouse,
+          assetId: this.queryList.id,
+          address: this.queryList.address
+        }).then(data => {
+          for(let i = 0; i < data.result.length; i++) {
+            // data.result[i].createTime = new Date(data.result[i].createTime)
+            data.result[i].createTime = this.dateFormat(data.result[i].createTime)
+          }
+          this.wareList = data.result
+          console.log(this.wareList);
+        })
+      },
+      dateFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
       }
     }
   }

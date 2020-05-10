@@ -19,11 +19,12 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryList.status">
-            <el-option label="空闲" value="shanghai"></el-option>
-            <el-option label="使用中" value="beijing"></el-option>
-            <el-option label="借用中" value="shanghai"></el-option>
-            <el-option label="维修中" value="beijing"></el-option>
-            <el-option label="报废" value="shanghai"></el-option>
+            <el-option label="" value=""></el-option>
+            <el-option label="空闲" value="空闲"></el-option>
+            <el-option label="使用中" value="使用中"></el-option>
+            <el-option label="借用中" value="借用中"></el-option>
+            <el-option label="维修中" value="维修中"></el-option>
+            <el-option label="报废" value="报废"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -38,7 +39,7 @@
         style="width: 100%">
         <el-table-column
           fixed
-          prop="assetId"
+          prop="id"
           label="资产编号"
           width="120">
         </el-table-column>
@@ -47,15 +48,15 @@
           label="资产名">
         </el-table-column>
         <el-table-column
-          prop="assetType"
+          prop="version"
           label="资产类型">
         </el-table-column>
         <el-table-column
-          prop="assetStatus"
+          prop="status"
           label="资产状态">
         </el-table-column>
         <el-table-column
-          prop="assetWarehouse"
+          prop="warehouseName"
           label="仓库">
         </el-table-column>
         <el-table-column
@@ -71,22 +72,16 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="block my-page">
-      <el-pagination
-        layout="prev, pager, next"
-        :total="1000">
-      </el-pagination>
-    </div>
     <!--弹框-->
     <!--资产借用申请-->
     <el-dialog title="资产借用申请"
                :modal-append-to-body="false"
                :visible.sync="dialogBorrowVisible">
       <el-form :model="assetBorrow" label-width="100px">
-        <el-form-item label="资产名">
+        <el-form-item label="资产名" disabled="true">
           <el-input v-model="assetBorrow.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="资产型号">
+        <el-form-item label="资产型号" disabled="true">
           <el-input v-model="assetBorrow.model" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="使用地点">
@@ -94,7 +89,7 @@
         </el-form-item>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="开始借用时间">
+            <el-form-item label="借用时间">
               <el-date-picker
                 v-model="assetBorrow.borrowDate"
                 type="date"
@@ -128,7 +123,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogBorrowVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogBorrowVisible = false">确 定</el-button>
+        <el-button type="primary" @click="sureBorrow">确 定</el-button>
       </div>
     </el-dialog>
     <!--资产领用申请-->
@@ -278,19 +273,31 @@
         <el-button type="primary" @click="dialogApplyVisible = false">确 定</el-button>
       </div>
     </el-dialog>
-    <!--资产使用-->
-    <el-dialog title="资产使用"
+    <!--资产详情-->
+    <el-dialog title="资产详情"
                :modal-append-to-body="false"
                :visible.sync="dialogUseVisible">
-      <el-form :model="assetUse" label-width="100px">
+      <el-form :model="assetUse" label-width="100px" disabled="true">
         <el-form-item label="资产名">
-          <el-input v-model="assetUse.name" autocomplete="off"></el-input>
+          <el-input v-model="assetUse.assetName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="资产型号">
-          <el-input v-model="assetUse.model" autocomplete="off"></el-input>
+          <el-input v-model="assetUse.version" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="使用地点">
-          <el-input v-model="assetUse.useAddress" autocomplete="off"></el-input>
+        <el-form-item label="产品">
+          <el-input v-model="assetUse.manufacture" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="单价">
+          <el-input v-model="assetUse.price" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="资源类型">
+          <el-input v-model="assetUse.status" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="购买日期">
+          <el-input v-model="assetUse.purchaseDate" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="使用年限">
+          <el-input v-model="assetUse.life" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="assetUse.remarks"
@@ -323,38 +330,13 @@
           id: '',
           warehouse: '',
           asset: '',
-          status: '空闲'
+          status: ''
         },
-        assetList: [
-          {
-          assetId: '1001',
-          assetName: '打印机',
-          assetType: 'E130',
-          assetStatus: '空闲',
-          assetWarehouse: '11楼1103'
-        },{
-          assetId: '1001',
-          assetName: '打印机',
-          assetType: 'E130',
-          assetStatus: '空闲',
-          assetWarehouse: '11楼1103'
-        },{
-          assetId: '1001',
-          assetName: '打印机',
-          assetType: 'E130',
-          assetStatus: '空闲',
-          assetWarehouse: '11楼1103'
-        },{
-          assetId: '1001',
-          assetName: '打印机',
-          assetType: 'E130',
-          assetStatus: '空闲',
-          assetWarehouse: '11楼1103'
-        }],
+        assetList: [],
         assetBorrow: {
           name: '',
           model: '',
-          useAdress: '',
+          useAddress: '',
           borrowDate: '',
           sendDate: '',
           urgent: '',
@@ -377,13 +359,30 @@
     components: {
       SubTitle
     },
+    created() {
+      this.getList()
+    },
     methods: {
       onSubmit() {
-        console.log('submit!');
+        this.getList()
       },
       handleBorrow(asset) {
         this.dialogBorrowVisible = true
+        this.assetBorrow.id = asset.id
         this.assetBorrow.name = asset.assetName
+        this.assetBorrow.model = asset.version
+      },
+      sureBorrow() {
+        this.dialogBorrowVisible = false
+        this.$post('/asset_manage/apply/postApply', {
+          address: this.assetBorrow.useAddress,
+          assetId: this.assetBorrow.id,
+          endTime: this.assetBorrow.sendDate,
+          startTime: this.assetBorrow.borrowDate,
+          urgency: this.assetBorrow.urgent,
+          type: 0,
+        })
+        .then(data => console.log(data))
       },
       handleReceive(asset) {
         this.dialogReceiveVisible = true
@@ -392,6 +391,11 @@
       handleUse(asset) {
         this.dialogUseVisible = true
         this.assetUse.name = asset.assetName
+        this.$get('/asset_manage/asset/assetDetail', {id: asset.id})
+        .then(data => {
+          this.assetUse = data.result
+        })
+        .catch(err => console.log(err))
       },
       handleApply() {
         this.dialogApplyVisible = true
@@ -399,6 +403,34 @@
       handleBad(asset) {
         this.dialogBadVisible = true
         this.assetBad.name = asset.assetName
+      },
+      getList() {
+        let statusArr = [['0', '1', '2', '3', '4'], ['空闲', '借用中', '使用中', '维修中', '报废']]
+        let myStatus = this.queryList.status
+        for (let i = 0; i < statusArr[0].length; i++) {
+          if (myStatus == statusArr[1][i]) {
+            myStatus = statusArr[0][i]
+          }
+        }
+        this.$get('/asset_manage/asset/assetList', {
+          currPage: 1,
+          pageSize: 50,
+          assetName: this.queryList.asset,
+          assetId: this.queryList.id,
+          warehouseName: this.queryList.warehouse,
+          status: myStatus
+        })
+          .then(data => {
+            for(let j = 0; j < statusArr[0].length; j++) {
+              for (let i = 0; i < data.result.length; i++) {
+                if (data.result[i].status == statusArr[0][j]) {
+                  data.result[i].status = statusArr[1][j]
+                }
+              }
+            }
+            this.assetList = data.result
+          })
+        .catch(err => console.log(err))
       }
     }
   }

@@ -4,17 +4,16 @@
     <el-link class="edit-profile" type="primary" @click="editForm">编辑资料</el-link>
     <el-form :model="profile" label-width="80px" :disabled="formDisabled">
       <el-form-item label="姓名">
-        <el-input v-model="profile.name" disabled="true"></el-input>
+        <el-input v-model="profile.userName"></el-input>
       </el-form-item>
-
       <el-form-item label="手机">
-        <el-input v-model="profile.phone"></el-input>
+        <el-input v-model="profile.telephone"></el-input>
       </el-form-item>
       <el-form-item label="邮箱">
-        <el-input v-model="profile.phone"></el-input>
+        <el-input v-model="profile.email"></el-input>
       </el-form-item>
       <el-form-item label="个性签名">
-        <el-input v-model="profile.phone"></el-input>
+        <el-input v-model="profile.signature"></el-input>
       </el-form-item>
       <q-separator></q-separator>
       <el-form-item label="资源使用历史" label-width="160">
@@ -27,20 +26,20 @@
             width="180">
           </el-table-column>
           <el-table-column
-            prop="name"
+            prop="assetName"
             label="资产名"
             width="180">
           </el-table-column>
           <el-table-column
-            prop="address"
+            prop="applyType"
             label="使用方式">
           </el-table-column>
           <el-table-column
-            prop="address"
+            prop="startTime"
             label="使用时间">
           </el-table-column>
           <el-table-column
-            prop="address"
+            prop="status"
             label="使用状态">
           </el-table-column>
         </el-table>
@@ -57,10 +56,21 @@
       return {
         subTitle: '个人中心',
         formDisabled: true,
-        profile: {
-          name: 'zhangsan '
-        }
+        profile: {},
+        history: []
       }
+    },
+    created() {
+      this.$get('/asset_manage/user/personalZone')
+        .then(data => {
+          this.profile = data.result
+        })
+      this.$get('/asset_manage/asset/getHistoryList', {
+        userName: sessionStorage.getItem('userEmail')
+      })
+        .then(data => {
+          this.history = data.result
+        })
     },
     components: {
       SubTitle
