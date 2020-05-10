@@ -75,7 +75,7 @@
           label="操作">
           <template slot-scope="scope">
             <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="true">同意</el-button>
-            <el-button type="text" size="small" @click="dialogDelete = true" :disabled="scope.row.isDeal">拒绝</el-button>
+            <el-button type="text" size="small" @click="handleReject(scope.row, scope.row.isDeal)" :disabled="scope.row.isDeal">拒绝</el-button>
             <el-button @click="handleDisagree(scope.row)" type="text" size="small">申请详情</el-button>
           </template>
         </el-table-column>
@@ -150,6 +150,7 @@
           jobLevel: this.queryList.level
         })
           .then(data => {
+            console.log(data);
             for(let i = 0; i < data.result.length; i++) {
               for(let j = 0; j < urgencyArr[0].length; j++) {
                 if(urgencyArr[0][j] == data.result[i].urgency) {
@@ -179,6 +180,26 @@
       },
       handleAgree(row, ff) {
         this.$get('/asset_manage/apply/agreeApply', {
+          applyId: row.id
+        })
+          .then(data => {
+            this.$q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
+            for(let i = 0; i < this.infoList.length; i++) {
+              if (this.infoList[i].result == '同意' || this.infoList[i].result == '拒绝') {
+                this.infoList[i].isDeal = true;
+              } else {
+                this.infoList[i].isDeal = false;
+              }
+            }
+          })
+      },
+      handleReject(row, ff) {
+        this.$get('/asset_manage/apply/disagreeApply', {
           applyId: row.id
         })
           .then(data => {

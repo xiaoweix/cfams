@@ -4,7 +4,7 @@
     <div class="query">
       <el-form :inline="true" :model="queryList" class="demo-form-inline">
         <el-form-item label="操作人">
-          <el-input v-model="queryList.name" placeholder="输入编号进行查询"></el-input>
+          <el-input v-model="queryList.name" placeholder="输入操作人进行查询"></el-input>
         </el-form-item>
         <el-form-item label="操作起止时间">
           <el-date-picker

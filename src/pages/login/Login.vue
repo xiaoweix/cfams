@@ -25,9 +25,9 @@
         ]"
       />
 
-      <div class="forgetPsd" @click="$router.push('/forget-password')">忘记密码</div>
+      <div class="register" @click="$router.push('/register')">注册</div>
       <br>
-      <div class="forgetPsd" @click="$router.push('/register')">注册</div>
+      <div class="forgetPsd" @click="$router.push('/forget-password')">忘记密码</div>
 
       <div>
         <q-btn label="登录" type="submit" color="primary"/>
@@ -59,29 +59,39 @@ export default {
       const password = this.password
       this.$get('/login', { email,password })
         .then(res => {
-          this.$router.push({ path: '/main', query: { email } })
-          this.userToken = res.result.token
-          this.userEmail = email
-          this.userCode = res.result.code
-          // 将用户token保存到vuex中
-          this.changeLogin({
-            token: this.userToken,
-            userEmail: this.userEmail,
-            userCode: this.userCode
-          })
-          this.$q.notify({
-            color: 'green-4',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: '登录成功'
-          })
+          if(res.code == 200) {
+            this.$router.push({ path: '/main', query: { email } })
+            this.userToken = res.result.token
+            this.userEmail = email
+            this.userCode = res.result.code
+            // 将用户token保存到vuex中
+            this.changeLogin({
+              token: this.userToken,
+              userEmail: this.userEmail,
+              userCode: this.userCode
+            })
+            this.$q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '登录成功'
+            })
+          }
+          else if(res.code == 500) {
+            this.$q.notify({
+              color: 'red-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: res.msg
+            })
+          }
         })
-        .catch(err => {
+        .catch(err =>  {
           this.$q.notify({
             color: 'red-4',
             textColor: 'white',
             icon: 'cloud_done',
-            message: '登录名或密码错误'
+            message: '服务器繁忙，稍后再试'
           })
         })
     }
@@ -100,8 +110,10 @@ export default {
   margin-top: 100px
 .q-btn
   width: 100%
-.forgetPsd
+.forgetPsd, .register
   float: right
+  display: block
+  margin: 0
   color: #31CCEC
   cursor: pointer
 .forgetPsd:hover

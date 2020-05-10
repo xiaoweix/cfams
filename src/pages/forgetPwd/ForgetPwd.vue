@@ -13,7 +13,7 @@
           lazy-rules
           :rules="[ val => val && val.length > 0 || '请输入正确邮箱']"
         />
-        <q-btn label="获取邮箱验证码" type="cancel"/>
+        <q-btn label="获取邮箱验证码" @click="sendCode"/>
       </div>
 
 
@@ -72,6 +72,77 @@ export default {
   },
   components: {
     Title
+  },
+  methods: {
+    sendCode() {
+      this.$get('/email/send', {
+        email: this.email
+      })
+        .then(() => {
+          this.$q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: '发送成功'
+          })
+        })
+    },
+    sendpsd() {
+      if(this.newPassword == this.newPassword2) {
+        this.$get('/email/checkEmail', {
+          email: this.email,
+          code: this.code
+        })
+          .then((data) => {
+            if(data.code == 200) {
+              this.$get('/password', {
+                password: this.newPassword
+              })
+                .then(data => {
+                  if(data.code == 200) {
+                    this.$q.notify({
+                      color: 'green-4',
+                      textColor: 'white',
+                      icon: 'cloud_done',
+                      message: data.msg
+                    })
+                  } else {
+                    this.$q.notify({
+                      color: 'red-4',
+                      textColor: 'white',
+                      icon: 'cloud_done',
+                      message: data.msg
+                    })
+                  }
+                })
+                .catch(err => {
+                  this.$q.notify({
+                    color: 'red-4',
+                    textColor: 'white',
+                    icon: 'cloud_done',
+                    message: err.msg
+                  })
+                })
+            }
+            else if (data.code == 500) {
+              this.$q.notify({
+                color: 'red-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: '验证码错误'
+              })
+            }
+          })
+          .catch(err => {
+            this.$q.notify({
+              color: 'red-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '服务器繁忙，稍后再试'
+            })
+          })
+      }
+    }
   }
 }
 </script>

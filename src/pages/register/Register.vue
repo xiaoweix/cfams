@@ -1,7 +1,7 @@
 <template>
   <div>
     <Title></Title>
-    <div class="text-h6">欢迎注册学院固定资产管理系统</div>
+    <div class="text-h6 my-title" align="center">欢迎注册学院固定资产管理系统</div>
     <div id="register-form">
       <q-form
         class="q-gutter-md"
@@ -38,7 +38,7 @@
               电子邮箱：
             </template>
           </q-input>
-          <q-btn color="primary">获取验证码</q-btn>
+          <q-btn color="primary" @click="sendCode">获取验证码</q-btn>
         </div>
 
         <!--验证码-->
@@ -81,27 +81,51 @@
     },
     methods: {
       onSubmit() {
-        this.$post('/register', {
+        this.$get('/email/checkEmail', {
           email: this.email,
-          password: this.password,
-          telephone: this.phone,
-          signature: this.mySay,
-          userName: this.nickname
+          code: this.code
         })
-          .then(data => {
+          .then((data) => {
             if(data.code == 200) {
-              this.$q.notify({
-                color: 'green-4',
-                textColor: 'white',
-                icon: 'cloud_done',
-                message: data.msg
+              this.$post('/register', {
+                email: this.email,
+                password: this.password,
+                telephone: this.phone,
+                signature: this.mySay,
+                userName: this.nickname
               })
-            } else {
+                .then(data => {
+                  if(data.code == 200) {
+                    this.$q.notify({
+                      color: 'green-4',
+                      textColor: 'white',
+                      icon: 'cloud_done',
+                      message: data.msg
+                    })
+                  } else {
+                    this.$q.notify({
+                      color: 'red-4',
+                      textColor: 'white',
+                      icon: 'cloud_done',
+                      message: data.msg
+                    })
+                  }
+                })
+                .catch(err => {
+                  this.$q.notify({
+                    color: 'red-4',
+                    textColor: 'white',
+                    icon: 'cloud_done',
+                    message: err.msg
+                  })
+                })
+            }
+            else if (data.code == 500) {
               this.$q.notify({
                 color: 'red-4',
                 textColor: 'white',
                 icon: 'cloud_done',
-                message: data.msg
+                message: '验证码错误'
               })
             }
           })
@@ -110,7 +134,20 @@
               color: 'red-4',
               textColor: 'white',
               icon: 'cloud_done',
-              message: err.msg
+              message: '服务器繁忙，稍后再试'
+            })
+          })
+      },
+      sendCode() {
+        this.$get('/email/send', {
+          email: this.email
+        })
+          .then(() => {
+            this.$q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '发送成功'
             })
           })
       }
@@ -140,4 +177,6 @@
 .submit
   width: 300px
   float: right
+.my-title
+  margin: 20px 0
 </style>

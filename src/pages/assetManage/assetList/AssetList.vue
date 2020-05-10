@@ -3,6 +3,7 @@
     <SubTitle :subTitle="subTitle"/>
     <q-btn color="primary"
            text-color="white"
+           :style="{display: isShowButton ? 'inline-block': 'none'}"
            label="申请采购"
            @click="handleApply"
            class="apply"/>
@@ -66,7 +67,7 @@
           <template slot-scope="scope">
             <el-button @click="handleUse(scope.row)" type="text" size="small">详情</el-button>
             <el-button type="text" size="small" @click="handleBorrow(scope.row)">借用</el-button>
-            <el-button @click="handleReceive(scope.row)" type="text" size="small">申领</el-button>
+            <el-button @click="handleReceive(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}">申领</el-button>
             <el-button type="text" size="small" @click="handleBad(scope.row)">反馈</el-button>
           </template>
         </el-table-column>
@@ -141,7 +142,7 @@
           <el-input v-model="assetReceive.useAddress" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="数量">
-          <el-input v-model="assetReceive.count" autocomplete="off"></el-input>
+          <el-input v-model="assetReceive.number" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="紧急程度">
           <template>
@@ -159,7 +160,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogReceiveVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogReceiveVisible = false">确 定</el-button>
+        <el-button type="primary" @click="sureReceive">确 定</el-button>
       </div>
     </el-dialog>
     <!--资产损坏反馈-->
@@ -333,27 +334,15 @@
           status: ''
         },
         assetList: [],
-        assetBorrow: {
-          name: '',
-          model: '',
-          useAddress: '',
-          borrowDate: '',
-          sendDate: '',
-          urgent: '',
-          remarks: ''
-        },
-        assetReceive: {
-          name: '',
-          model: '',
-          useAdress: '',
-          borrowDate: '',
-          sendDate: '',
-          urgent: '',
-          remarks: ''
-        },
+        // 借用
+        assetBorrow: {},
+        // 申领
+        assetReceive: {},
         assetBad: {},
         assetApply: {},
-        assetUse: {}
+        assetUse: {},
+        isShowButton: false,
+        isShowApply: false
       }
     },
     components: {
@@ -361,11 +350,23 @@
     },
     created() {
       this.getList()
+      const code = sessionStorage.getItem('userCode')
+      if(code == 1) {
+        this.isShowButton = false
+        this.isShowApply = false
+      } else if (code == 2) {
+        this.isShowButton = true
+        this.isShowApply = false
+      } else {
+        this.isShowButton = true
+        this.isShowApply = true
+      }
     },
     methods: {
       onSubmit() {
         this.getList()
       },
+      // 借用
       handleBorrow(asset) {
         this.dialogBorrowVisible = true
         this.assetBorrow.id = asset.id
@@ -377,17 +378,44 @@
         this.$post('/asset_manage/apply/postApply', {
           address: this.assetBorrow.useAddress,
           assetId: this.assetBorrow.id,
-          endTime: this.assetBorrow.sendDate,
-          startTime: this.assetBorrow.borrowDate,
+          endTime: this.dateFormat(this.assetBorrow.sendDate),
+          startTime: this.dateFormat(this.assetBorrow.borrowDate),
           urgency: this.assetBorrow.urgent,
-          type: 0,
+          type: 1,
         })
-        .then(data => console.log(data))
+        .then((data) => {
+          if(data.code == 200) {
+            this.$q.notify({
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '提交成功'
+            })
+          }
+        })
       },
+
+      // 申领
       handleReceive(asset) {
         this.dialogReceiveVisible = true
+        this.assetReceive.id = asset.id
         this.assetReceive.name = asset.assetName
+        this.assetReceive.model = asset.version
       },
+      sureReceive() {
+        this.dialogReceiveVisible = false
+        this.$post('/asset_manage/apply/postApply', {
+          address: this.assetReceive.useAddress,
+          assetId: this.assetReceive.id,
+          urgency: this.assetReceive.urgent,
+          remarks: this.assetReceive.remarks,
+          number: this.assetReceive.number,
+          type: 2,
+        })
+          .then(data => console.log(data))
+      },
+
+      // 详情
       handleUse(asset) {
         this.dialogUseVisible = true
         this.assetUse.name = asset.assetName
@@ -397,9 +425,12 @@
         })
         .catch(err => console.log(err))
       },
+
+      // 申请采购
       handleApply() {
         this.dialogApplyVisible = true
       },
+      // 反馈
       handleBad(asset) {
         this.dialogBadVisible = true
         this.assetBad.name = asset.assetName
@@ -431,6 +462,20 @@
             this.assetList = data.result
           })
         .catch(err => console.log(err))
+      },
+      dateFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
       }
     }
   }

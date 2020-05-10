@@ -1,16 +1,17 @@
 <template>
   <div class="my-profile">
     <SubTitle :subTitle="subTitle"/>
-    <el-link class="edit-profile" type="primary" @click="editForm">编辑资料</el-link>
+    <el-link class="edit-profile" type="primary" @click="editForm" v-if="formDisabled">编辑资料</el-link>
+    <el-link class="edit-profile" type="primary" @click="sureEdit" v-else>确定</el-link>
     <el-form :model="profile" label-width="80px" :disabled="formDisabled">
       <el-form-item label="姓名">
-        <el-input v-model="profile.userName"></el-input>
+        <el-input v-model="profile.userName" disabled></el-input>
       </el-form-item>
       <el-form-item label="手机">
         <el-input v-model="profile.telephone"></el-input>
       </el-form-item>
       <el-form-item label="邮箱">
-        <el-input v-model="profile.email"></el-input>
+        <el-input v-model="profile.email" disabled></el-input>
       </el-form-item>
       <el-form-item label="个性签名">
         <el-input v-model="profile.signature"></el-input>
@@ -57,19 +58,20 @@
         subTitle: '个人中心',
         formDisabled: true,
         profile: {},
-        history: []
+        history: [],
+        id: ''
       }
     },
     created() {
+      // 1:借用、2:申领、3:采购、4:反馈
+      let statuses = [[], []]
+      let applyTypes = [[], []]
       this.$get('/asset_manage/user/personalZone')
         .then(data => {
           this.profile = data.result
-        })
-      this.$get('/asset_manage/asset/getHistoryList', {
-        userName: sessionStorage.getItem('userEmail')
-      })
-        .then(data => {
-          this.history = data.result
+          this.id = data.result.id
+          this.history = data.result.assetUseHistoryBOList
+          console.log(data)
         })
     },
     components: {
@@ -78,6 +80,32 @@
     methods: {
       editForm() {
         this.formDisabled = false
+      },
+      sureEdit() {
+        const id = this.id
+        const {telephone, signature} = this.profile
+        this.$post('/asset_manage/user/modifyUser', {
+          telephone, signature, id
+        })
+          .then(res => {
+            this.formDisabled = true
+            if(res.code == 200) {
+              this.$q.notify({
+                color: 'green-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: '修改成功'
+              })
+            }
+            else {
+              this.$q.notify({
+                color: 'red-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: res.msg
+              })
+            }
+          })
       }
     }
   }

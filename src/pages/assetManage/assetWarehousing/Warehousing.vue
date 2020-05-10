@@ -24,15 +24,17 @@
         <el-input v-model="warehousing.age"></el-input>
       </el-form-item>
       <el-form-item label="采购数量">
-        <el-input v-model="warehousing.name"></el-input>
+        <el-input v-model="warehousing.num"></el-input>
       </el-form-item>
       <el-form-item label="类型">
         <div class="row">
           <el-select v-model="warehousing.type">
-            <el-option label="数码产品" value="shanghai"></el-option>
-            <el-option label="电子产品" value="beijing"></el-option>
-            <el-option label="办公用具" value="shanghai"></el-option>
-            <el-option label="家具" value="beijing"></el-option>
+            <el-option
+              v-for="item in types"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
           </el-select>
           <div>没有想要的类型？点击
             <el-link type="primary" @click.native="addType = true"> 添加类型 </el-link>
@@ -41,9 +43,9 @@
       </el-form-item>
       <el-form-item label="资源权限">
         <template>
-          <el-radio v-model="warehousing.power" label="1">不可见</el-radio>
-          <el-radio v-model="warehousing.power" label="2">可借</el-radio>
-          <el-radio v-model="warehousing.power" label="2">可领</el-radio>
+          <el-radio v-model="warehousing.power" label="0">借用</el-radio>
+          <el-radio v-model="warehousing.power" label="1">领用</el-radio>
+          <el-radio v-model="warehousing.power" label="2">使用</el-radio>
         </template>
       </el-form-item>
       <el-form-item label="上传图片">
@@ -101,7 +103,7 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addType = false">取 消</el-button>
-        <el-button type="primary" @click="addType = false">确 定</el-button>
+        <el-button type="primary" @click="sureAddType">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -125,25 +127,46 @@
         needCount: '',
         addType: false,
         warehousing: {},
-        typeName: '电脑'
+        typeName: '',
+        types: []
       }
     },
     components: {
       SubTitle
     },
     created() {
-      // this.$get('')
+      const self = this
+      this.$get('/asset_manage/assetType/assetTypeList')
+        .then(data => {
+          data.result.forEach(function (v, i, a) {
+            self.types.push({
+              value: v.id,
+              label: v.typeName
+            })
+          })
+        })
     },
     methods: {
       sureAdd() {
         this.$post('/asset_manage/asset/addAsset', {
-          assetName: '',
-          assetNum: '',
+          assetName: this.warehousing.name,
+          assetNum: this.warehousing.num,
           image1: '',
           image2: '',
           image3: '',
-          life: ''
+          life: this.warehousing.age,
+          version: this.warehousing.model,
+          manufacture: this.warehousing.factory,
+          price: this.warehousing.price,
+          typeId: this.warehousing.type,
+          useType: this.warehousing.power
         })
+          .then(data => console.log(data))
+      },
+      sureAddType() {
+        this.addType = false
+        this.$post('/asset_manage/assetType/addAssetType', this.typeName)
+          .then(data => console.log(data))
       }
     }
   }
