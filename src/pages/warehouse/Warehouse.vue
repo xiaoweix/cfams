@@ -72,20 +72,20 @@
 <!--    修改-->
     <el-dialog
       title="编辑仓库"
-      :visible.sync="dialogView"
+      :visible.sync="dialogEdit"
       :modal-append-to-body="false"
       top="120px"
       width="30%">
-      <el-form :model="currentRow" label-width="100px">
+      <el-form :model="editRow" label-width="100px">
         <el-form-item label="仓库名">
-          <el-input v-model="currentRow.editname" autocomplete="off"></el-input>
+          <el-input v-model="editRow.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="仓库地点">
-          <el-input v-model="currentRow.editAddress" autocomplete="off"></el-input>
+          <el-input v-model="editRow.address" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogView = false">取 消</el-button>
+        <el-button @click="dialogEdit = false">取 消</el-button>
         <el-button type="primary" @click="sureEdit">确 定</el-button>
       </span>
     </el-dialog>
@@ -96,15 +96,25 @@
       :modal-append-to-body="false"
       top="120px"
       width="30%">
-      <el-form :model="currentRow" label-width="100px">
+      <el-form :model="addRow" label-width="100px">
         <el-form-item label="仓库名">
-          <el-input v-model="currentRow.addName" autocomplete="off"></el-input>
+          <el-input v-model="addRow.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="仓库地点">
-          <el-input v-model="currentRow.addAddress" autocomplete="off"></el-input>
+          <el-input v-model="addRow.address" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="仓库名">
+          <el-select v-model="addRow.mapId" placeholder="请选择">
+            <el-option
+              v-for="item in maps"
+              :key="item.id"
+              :label="item.mapName"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input v-model="currentRow.addRemarks" autocomplete="off"></el-input>
+          <el-input v-model="addRow.remarks" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -122,13 +132,17 @@
     data() {
       return {
         subTitle: '仓库列表',
+        editRow: {},
         queryList: {},
         deleteId: '',
         currentRow: {},
-        dialogView: false,
+        editId: 0,
+        dialogEdit: false,
         dialogDelete: false,
         dialogAdd: false,
-        wareList: []
+        wareList: [],
+        maps: [],
+        addRow: {}
       }
     },
     components: {
@@ -140,18 +154,28 @@
     methods: {
       handleAddWarehouse() {
         this.dialogAdd = true
+        this.$get('/asset_manage/dataMap/assetMapList')
+          .then(data => {
+            console.log(data.result)
+            this.maps = data.result
+          })
       },
       onSubmit() {
         this.getWareList()
       },
       // 修改
       handleEdit (row) {
-        this.currentRow = {}
-        this.dialogView = true
-        this.currentRow.editname = row.name
-        this.currentRow.editAddress = row.address
+        this.dialogEdit = true
+        this.editId = row.id
+        this.$get('/asset_manage/warehouse/warehouseList',{assetId: row.id})
+          .then(data => {
+            this.editRow = data.result[0]
+          })
       },
       sureEdit() {
+        this.dialogEdit = false
+        this.$post('/asset_manage/warehouse/modifyWarehouse',{id: this.editId,address: this.editRow.address,name:this.editRow.name})
+          .then(data => console.log(data))
       },
       // 删除
       handleDelete (row) {
@@ -161,7 +185,6 @@
       },
       sureDelete () {
         const id = this.deleteId
-        console.log(id);
         this.dialogDelete = false
         this.$get('/asset_manage/warehouse/removeWarehouse', {
           warehouseId: id
@@ -179,19 +202,18 @@
 
       sureAdd () {
         this.$post('/asset_manage/warehouse/addWarehouse', {
-          name: this.currentRow.name,
-          address: this.currentRow.address,
-          remarks: this.currentRow.remarks
+          name: this.addRow.name,
+          address: this.addRow.address,
+          remarks: this.addRow.remarks,
+          mapId: this.addRow.mapId
         })
           .then(data => {
-            console.log(data)
-            this.wareList.push(this.currentRow)
+            this.wareList.push(this.addRow)
           })
           .catch(err => {
             console.log(err);
           })
         this.dialogAdd = false
-        this.currentRow = {}
       },
       getWareList() {
         this.$get('/asset_manage/warehouse/warehouseList', {

@@ -76,11 +76,44 @@
           <template slot-scope="scope">
             <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="scope.row.isDeal">同意</el-button>
             <el-button type="text" size="small" @click="handleReject(scope.row, scope.row.isDeal)" :disabled="scope.row.isDeal">拒绝</el-button>
-            <el-button @click="handleDisagree(scope.row)" type="text" size="small">申请详情</el-button>
+            <el-button @click="handleView(scope.row)" type="text" size="small">申请详情</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog title="信息详情"
+               :modal-append-to-body="false"
+               :visible.sync="dialogBadVisible">
+      <el-form :model="detail" label-width="100px" disabled>
+        <el-form-item label="资产名">
+          <el-input v-model="detail.assetName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="资产型号">
+          <el-input v-model="detail.assetVersion" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="使用地点">
+          <el-input v-model="detail.address" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="申请人">
+          <el-input v-model="detail.userName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="开始时间">
+          <el-input v-model="detail.startTime" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-input v-model="detail.endTime" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="detail.remarks"
+                    autocomplete="off"
+                    type="textarea"
+                    autosize></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogBadVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,6 +124,8 @@
     data() {
       return {
         subTitle: '信息列表',
+        dialogBadVisible: false,
+        detail: {},
         infoList: [],
         levels: [
           {
@@ -141,7 +176,7 @@
       getList() {
         let urgencyArr = [['1', '2', '3'], ['不急', '一般', '急用']]
         let resultArr = [['0', '1', '2'], ['待处理', '同意', '拒绝']]
-        let typeArr = [['1', '2', '3', '4'], ['借用', '申领', '采购', '反馈']]
+        let typeArr = [['1', '2', '3', '4', '5'], ['借用', '领用', '使用', '采购', '反馈']]
         this.$get('/asset_manage/apply/assetLogList', {
           assetId: this.queryList.id,
           userName: this.queryList.name,
@@ -150,7 +185,6 @@
           jobLevel: this.queryList.level
         })
           .then(data => {
-            console.log(data);
             for(let i = 0; i < data.result.length; i++) {
               for(let j = 0; j < urgencyArr[0].length; j++) {
                 if(urgencyArr[0][j] == data.result[i].urgency) {
@@ -190,6 +224,7 @@
               message: data.msg
             })
           })
+        row.isDeal = true
       },
       handleReject(row) {
         this.$get('/asset_manage/apply/disagreeApply', {
@@ -202,14 +237,15 @@
               icon: 'cloud_done',
               message: data.msg
             })
-            for(let i = 0; i < this.infoList.length; i++) {
-              if (this.infoList[i].result == '同意' || this.infoList[i].result == '拒绝') {
-                this.infoList[i].isDeal = true;
-              } else {
-                this.infoList[i].isDeal = false;
-              }
-            }
+            row.isDeal = true
           })
+      },
+      handleView(row) {
+        this.dialogBadVisible = true
+        this.$get('/asset_manage/apply/assetApplyDetail')
+        .then(data => {
+          this.detail = data.result
+        })
       }
     }
   }

@@ -42,32 +42,36 @@
           fixed
           prop="id"
           label="资产编号"
-          width="120">
+          width="100">
         </el-table-column>
         <el-table-column
           prop="assetName"
-          label="资产名">
+          label="资产名"
+          width="160">
         </el-table-column>
         <el-table-column
           prop="version"
-          label="资产类型">
+          label="资产类型"
+          width="140">
         </el-table-column>
         <el-table-column
           prop="status"
-          label="资产状态">
+          label="资产状态"
+          width="140">
         </el-table-column>
         <el-table-column
           prop="warehouseName"
-          label="仓库">
+          label="仓库"
+          width="180">
         </el-table-column>
         <el-table-column
           fixed="right"
-          label="操作"
-          width="180">
+          label="操作">
           <template slot-scope="scope">
             <el-button @click="handleUse(scope.row)" type="text" size="small">详情</el-button>
-            <el-button type="text" size="small" @click="handleBorrow(scope.row)">借用</el-button>
-            <el-button @click="handleReceive(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}">申领</el-button>
+            <el-button type="text" size="small" @click="handleBorrow(scope.row)" :disabled="scope.row.isD">借用</el-button>
+            <el-button @click="handleEmploy(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}">使用</el-button>
+            <el-button @click="handleReceive(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}" :disabled="scope.row.isD">申领</el-button>
             <el-button type="text" size="small" @click="handleBad(scope.row)">反馈</el-button>
           </template>
         </el-table-column>
@@ -163,6 +167,32 @@
         <el-button type="primary" @click="sureReceive">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 使用 -->
+    <el-dialog title="资产使用"
+               :modal-append-to-body="false"
+               :visible.sync="dialogEmploy">
+      <el-form :model="assetEmploy" label-width="100px">
+        <el-form-item label="资产名">
+          <el-input v-model="assetEmploy.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="资产型号">
+          <el-input v-model="assetEmploy.model" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="使用地点">
+          <el-input v-model="assetEmploy.address" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="assetEmploy.remarks"
+                    autocomplete="off"
+                    type="textarea"
+                    autosize></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogBadVisible = false">取 消</el-button>
+        <el-button type="primary" @click="sureEmploy">确 定</el-button>
+      </div>
+    </el-dialog>
     <!--资产损坏反馈-->
     <el-dialog title="资产损坏反馈"
                :modal-append-to-body="false"
@@ -185,15 +215,19 @@
           </template>
         </el-form-item>
         <el-form-item label="损坏图片">
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="assetBad.badPic1"></el-image>
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="assetBad.badPic2"></el-image>
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="assetBad.badPic3"></el-image>
+          <el-upload
+            action="http://39.105.45.77:8082/asset_manage/file/fileUpload"
+            list-type="picture-card"
+            :headers="fileHeader"
+            auto-upload
+            :on-success="fileSuccess"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="assetBad.remarks"
@@ -204,7 +238,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogBadVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogBadVisible = false">确 定</el-button>
+        <el-button type="primary" @click="sureBad">确 定</el-button>
       </div>
     </el-dialog>
     <!--申请采购-->
@@ -219,28 +253,8 @@
           <el-input v-model="assetApply.model" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="生产厂家">
-          <el-input v-model="assetApply.store" autocomplete="off"></el-input>
+          <el-input v-model="assetApply.factory" autocomplete="off"></el-input>
         </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="开始借用时间">
-              <el-date-picker
-                v-model="assetBorrow.borrowDate"
-                type="date"
-                placeholder="选择日期">
-              </el-date-picker>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="归还时间">
-              <el-date-picker
-                v-model="assetBorrow.sendDate"
-                type="date"
-                placeholder="选择日期">
-              </el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-form-item label="紧急程度">
           <template>
             <el-radio v-model="assetApply.urgent" label="1">不急</el-radio>
@@ -252,15 +266,19 @@
           <el-input v-model="assetApply.count" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="资源图片">
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="assetApply.assetPic1"></el-image>
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="assetApply.assetPic2"></el-image>
-          <el-image
-            style="width: 100px; height: 100px"
-            :src="assetApply.assetPic3"></el-image>
+          <el-upload
+            action="http://39.105.45.77:8082/asset_manage/file/fileUpload"
+            list-type="picture-card"
+            :headers="fileHeader"
+            auto-upload
+            :on-success="fileSuccess"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="applyVisible">
+            <img width="100%" :src="applyImg" alt="">
+          </el-dialog>
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="assetApply.remarks"
@@ -271,7 +289,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogApplyVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogApplyVisible = false">确 定</el-button>
+        <el-button type="primary" @click="sureApply">确 定</el-button>
       </div>
     </el-dialog>
     <!--资产详情-->
@@ -308,7 +326,6 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogUseVisible = false">取 消</el-button>
         <el-button type="primary" @click="dialogUseVisible = false">确 定</el-button>
       </div>
     </el-dialog>
@@ -333,7 +350,10 @@
           asset: '',
           status: ''
         },
+        fileHeader: {},
         assetList: [],
+        dialogEmploy: false,
+        assetEmploy: {},
         // 借用
         assetBorrow: {},
         // 申领
@@ -342,7 +362,12 @@
         assetApply: {},
         assetUse: {},
         isShowButton: false,
-        isShowApply: false
+        isShowApply: false,
+        dialogImageUrl: '',
+        dialogVisible: false,
+        applyVisible: false,
+        applyImg: '',
+        employId: 0,
       }
     },
     components: {
@@ -350,6 +375,9 @@
     },
     created() {
       this.getList()
+      this.fileHeader = {
+        'token': sessionStorage.getItem('token')
+      }
       const code = sessionStorage.getItem('userCode')
       if(code == 1) {
         this.isShowButton = false
@@ -365,6 +393,33 @@
     methods: {
       onSubmit() {
         this.getList()
+      },
+      // 使用
+      handleEmploy(asset) {
+        this.dialogEmploy = true
+        this.employId = asset.id
+        this.assetEmploy.name = asset.assetName
+        this.assetEmploy.model = asset.version
+      },
+      sureEmploy() {
+        this.dialogEmploy = false
+        this.$post('/asset_manage/apply/postApply', {
+          address: this.assetEmploy.address,
+          assetId: this.assetEmploy.id,
+          version: this.assetEmploy.model,
+          remarks: this.assetEmploy.remarks,
+          type: 3,
+        })
+          .then((data) => {
+            if(data.code == 200) {
+              this.$q.notify({
+                color: 'green-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: '提交成功'
+              })
+            }
+          })
       },
       // 借用
       handleBorrow(asset) {
@@ -430,11 +485,62 @@
       handleApply() {
         this.dialogApplyVisible = true
       },
+      sureApply () {
+        this.dialogApplyVisible = false
+        this.$post('/asset_manage/apply/postApply', {
+          address: this.assetApply.address,
+          assetName: this.assetApply.name,
+          manufacture: this.assetApply.factory,
+          version: this.assetApply.model,
+          urgency: this.assetApply.badLevel,
+          remarks: this.assetApply.remarks,
+          image1: this.assetApply.imgUrl1,
+          image2: this.assetApply.imgUrl2,
+          image3: this.assetApply.imgUrl3,
+          type: 4,
+        })
+          .then(data => console.log(data))
+      },
       // 反馈
       handleBad(asset) {
         this.dialogBadVisible = true
+        this.assetBad.id = asset.id
         this.assetBad.name = asset.assetName
+        this.assetBad.model = asset.version
       },
+      sureBad() {
+        this.dialogBadVisible = false
+        this.$post('/asset_manage/apply/postApply', {
+          address: this.assetBad.address,
+          assetId: this.assetBad.id,
+          urgency: this.assetBad.badLevel,
+          remarks: this.assetBad.remarks,
+          image1: this.assetBad.imgUrl1,
+          image2: this.assetBad.imgUrl2,
+          image3: this.assetBad.imgUrl3,
+          type: 5,
+        })
+          .then(data => console.log(data))
+      },
+      // 我的图片上传
+      fileSuccess(response, file, fileList) {
+        console.log(response, file, fileList);
+        if (fileList.length == 3) {
+          this.assetBad.imgUrl1 = response.result[0]
+          this.assetBad.imgUrl2 = response.result[1]
+          this.assetBad.imgUrl3 = response.result[2]
+        } else if (fileList.length == 2) {
+          this.assetBad.imgUrl1 = response.result[0]
+          this.assetBad.imgUrl2 = response.result[1]
+        } else if (fileList.length == 1) {
+          this.assetBad.imgUrl1 = response.result[0]
+        } else {
+          this.assetBad.imgUrl1 = ''
+          this.assetBad.imgUrl2 = ''
+          this.assetBad.imgUrl3 = ''
+        }
+      },
+
       getList() {
         let statusArr = [['0', '1', '2', '3', '4'], ['空闲', '借用中', '使用中', '维修中', '报废']]
         let myStatus = this.queryList.status
@@ -454,6 +560,9 @@
           .then(data => {
             for(let j = 0; j < statusArr[0].length; j++) {
               for (let i = 0; i < data.result.length; i++) {
+                if (data.result[i].status == 1) {
+                  data.result[i].isD = true
+                }
                 if (data.result[i].status == statusArr[0][j]) {
                   data.result[i].status = statusArr[1][j]
                 }
@@ -476,6 +585,15 @@
         var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
         // 拼接
         return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
+      },
+
+      // 图片上传测试
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogVisible = true;
       }
     }
   }

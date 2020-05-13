@@ -68,28 +68,24 @@
                width="40%"
                :visible.sync="dialogView"
                title="资产使用详情">
-      <el-form :model="assetDetail" label-width="120px">
+      <el-form :model="assetDetail" label-width="120px" disabled>
         <el-form-item label="资产名">
           <el-input v-model="assetDetail.assetName"></el-input>
         </el-form-item>
         <el-form-item label="资产型号">
-          <el-input v-model="assetDetail.model"></el-input>
+          <el-input v-model="assetDetail.assetVersion"></el-input>
         </el-form-item>
         <el-form-item label="使用地点">
-          <el-input v-model="assetDetail.useAddress"></el-input>
+          <el-input v-model="assetDetail.address"></el-input>
         </el-form-item>
-        <el-form-item label="开始使用时间">
+        <el-form-item label="开始时间">
           <el-input v-model="assetDetail.startTime"></el-input>
         </el-form-item>
         <el-form-item label="结束时间">
           <el-input v-model="assetDetail.endTime"></el-input>
         </el-form-item>
         <el-form-item label="紧急程度">
-          <template>
-            <el-radio v-model="assetDetail.urgent" label="1">不急</el-radio>
-            <el-radio v-model="assetDetail.urgent" label="2">一般</el-radio>
-            <el-radio v-model="assetDetail.urgent" label="3">急用</el-radio>
-          </template>
+          <el-input v-model="assetDetail.urgency"></el-input>
         </el-form-item>
         <el-form-item label="数量">
           <el-input v-model="assetDetail.count"></el-input>
@@ -99,7 +95,6 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogView = false">取 消</el-button>
         <el-button type="primary" @click="dialogView = false">确 定</el-button>
       </div>
     </el-dialog>
@@ -112,13 +107,13 @@
     name: "AssetUseHistory",
     data() {
       return {
-        subTitle: '资产使用历史',
-        dialogView: false,
-        queryList: {},
-        assetList: [],
-        assetDetail: {}
-      }
-    },
+    subTitle: '资产使用历史',
+    dialogView: false,
+    queryList: {},
+    assetList: [],
+    assetDetail: {}
+  }
+  },
     created() {
       this.getList()
     },
@@ -131,16 +126,47 @@
       },
       handleView(asset) {
         this.dialogView = true
+        this.$get('/asset_manage/apply/assetApplyDetail')
+        .then(data => {
+          this.assetDetail = data.result
+          for(let i = 0; i < data.result.length; i++) {
+            data.result[i].startTime = this.dateFormat(data.result[i].startTime)
+            data.result[i].endTime = this.dateFormat(data.result[i].endTime)
+          }
+        })
       },
       getList() {
+        const types = [['1', '2', '3', '4', '5'], ['借用', '申领', '使用', '采购', '反馈']]
         this.$get('/asset_manage/asset/getHistoryList', {
           assetId: '',
           assetName: '',
           userName: '',
           type: ''
         }).then(data => {
+          for(let i = 0; i < data.result.length; i++) {
+            data.result[i].startTime = this.dateFormat(data.result[i].startTime)
+            for (let j = 0; j < types[0].length; j++) {
+              if (data.result[i].applyType == types[0][j]) {
+                data.result[i].applyType = types[1][j]
+              }
+            }
+          }
           this.assetList = data.result
         })
+      },
+      dateFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
       }
     }
   }

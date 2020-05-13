@@ -60,8 +60,10 @@
           label="级别">
         </el-table-column>
         <el-table-column
-          prop="status"
           label="状态">
+          <template slot-scope="scope">
+            <el-button @click="changeStatus(scope.row)" type="text" size="small">{{scope.row.status}}</el-button>
+          </template>
         </el-table-column>
         <el-table-column
           prop="count"
@@ -87,17 +89,94 @@
         <el-button type="primary" @click="sureDelete()">确 定</el-button>
       </span>
     </el-dialog>
-    <!--编辑-->
+    <!--申请通过-->
     <el-dialog
-      title="提示"
-      :visible.sync="dialogDelete"
+      title="申请信息"
+      :visible.sync="dialogDeal"
       :modal-append-to-body="false"
       top="120px"
       width="30%">
-      <span>确认删除吗？</span>
+      <el-form :model="applyUser" label-width="100px">
+        <el-form-item label="姓名">
+          <el-input v-model="applyUser.userName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="applyUser.telephone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="applyUser.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="个性签名">
+          <el-input v-model="applyUser.signature" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogDelete = false">取 消</el-button>
-        <el-button type="primary" @click="sureDelete()">确 定</el-button>
+        <el-button type="primary" @click="passApply()">通过申请</el-button>
+        <el-button @click="notApply()">拒绝申请</el-button>
+      </span>
+    </el-dialog>
+    <!--资料详情-->
+    <el-dialog
+      title="资料详情"
+      :visible.sync="dialogDetail"
+      :modal-append-to-body="false"
+      top="120px"
+      width="30%">
+      <el-form :model="user" label-width="100px" disabled>
+        <el-form-item label="姓名">
+          <el-input v-model="user.userName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="user.telephone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="user.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="个性签名">
+          <el-input v-model="user.signature" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogDetail = false">确定</el-button>
+      </span>
+    </el-dialog>
+    <!--编辑-->
+    <el-dialog
+      title="编辑资料"
+      :visible.sync="dialogEdit"
+      :modal-append-to-body="false"
+      top="120px"
+      width="30%">
+      <el-form :model="userEdit" label-width="100px">
+        <el-form-item label="姓名">
+          <el-input v-model="userEdit.userName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="userEdit.password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="userEdit.telephone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="userEdit.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="身份">
+          <el-select v-model="userEdit.jobLevel" placeholder="请选择">
+            <el-option
+              v-for="item in jobLevels"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="个性签名">
+          <el-input v-model="userEdit.signature" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogEdit = false">取 消</el-button>
+        <el-button type="primary" @click="sureEdit">确定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -156,7 +235,32 @@
         userList: [],
         deleteId: '',
         currentPage: 1,
-        isSysAdmin: true
+        isSysAdmin: true,
+        dialogDeal: false,
+        dialogDetail: false,
+        dialogEdit: false,
+        user: {},
+        applyUser: {},
+        userEdit: {},
+        editId: 0,
+        jobLevels: [
+          {
+            value: 1,
+            label: '普通学生用户'
+          },
+          {
+            value: 2,
+            label: '教师用户'
+          },
+          {
+            value: 3,
+            label: '管理员'
+          },
+          {
+            value: 9,
+            label: '超级管理员'
+          }
+        ]
       }
     },
     components: {
@@ -194,8 +298,37 @@
         })
         this.dialogDelete = false
       },
-      handleEdit () {
-        // this.$post('/asset_manage/user/modifyUser')
+      handleEdit (row) {
+        this.dialogEdit = true
+        let { id } = row
+        this.editId = id
+        this.$get('/asset_manage/user/userDetail', { userId: id })
+          .then(data => {
+            switch (data.result.jobLevel) {
+              case 1:
+                data.result.jobLevel = '普通学生用户'
+                break
+              case 2:
+                data.result.jobLevel = '教师用户'
+                break
+              case 3:
+                data.result.jobLevel = '管理员'
+                break
+              case 9:
+                data.result.jobLevel = '超级管理员'
+                break
+            }
+            this.userEdit = data.result
+          })
+      },
+      sureEdit () {
+        this.dialogEdit = false
+        let { email, jobLevel, password, signature, telephone, userName } = this.userEdit
+        let id = this.editId
+        this.$get('/asset_manage/user/userDetail', { userId: id, email, jobLevel, password, signature, telephone, userName })
+          .then(data => {
+            this.queryUserList()
+          })
       },
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
@@ -243,6 +376,53 @@
           })
           .catch(err => {
             console.log(err);
+          })
+      },
+      changeStatus(row) {
+        let { status, id } = row
+        if (status == '正常') {
+          status = 1
+        } else if (status == '锁定') {
+          status = 2
+        } else if (status == '待处理') {
+          this.dialogDeal = true
+          this.$get('/asset_manage/user/userDetail', { userId: id })
+           .then(data => {
+             this.applyUser = data.result
+           })
+        }
+        if (status == 1 || status == 2) {
+          this.dialogDeal = false
+          this.$post('/asset_manage/user/modifyUser', {
+            id, status
+          })
+            .then(data => {
+              this.queryUserList()
+            })
+        }
+      },
+      passApply () {
+        this.$post('/asset_manage/user/modifyUser', {
+          id, status: 2
+        })
+          .then(data => {
+            this.queryUserList()
+          })
+      },
+      notApply () {
+        this.$post('/asset_manage/user/modifyUser', {
+          id, status: 1
+        })
+          .then(data => {
+            this.queryUserList()
+          })
+      },
+      handleView (row) {
+        this.dialogDetail = true
+        let { id } = row
+        this.$get('/asset_manage/user/userDetail', { userId: id })
+          .then(data => {
+            this.user = data.result
           })
       }
     }

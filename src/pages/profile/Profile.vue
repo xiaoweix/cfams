@@ -23,7 +23,7 @@
           style="width: 100%">
           <el-table-column
             prop="id"
-            label="资产编号"
+            label="申请编号"
             width="180">
           </el-table-column>
           <el-table-column
@@ -40,7 +40,7 @@
             label="使用时间">
           </el-table-column>
           <el-table-column
-            prop="status"
+            prop="result"
             label="使用状态">
           </el-table-column>
         </el-table>
@@ -63,15 +63,26 @@
       }
     },
     created() {
-      // 1:借用、2:申领、3:采购、4:反馈
-      let statuses = [[], []]
-      let applyTypes = [[], []]
+      // 1:借用、2:申领、3:使用、4:采购、5:反馈
+      const types = [['1', '2', '3', '4', '5'], ['借用', '申领', '使用', '采购', '反馈']]
+      const results = [['0', '1', '2', '3'], ['待处理', '同意', '拒绝', '完成']]
       this.$get('/asset_manage/user/personalZone')
         .then(data => {
           this.profile = data.result
           this.id = data.result.id
+          for(let i = 0; i < data.result.assetUseHistoryBOList.length; i++) {
+            for(let j = 0; j < types[0].length; j++) {
+              if(data.result.assetUseHistoryBOList[i].applyType == types[0][j]) {
+                data.result.assetUseHistoryBOList[i].applyType = types[1][j]
+              }
+            }
+            for(let j = 0; j < results[0].length; j++) {
+              if(data.result.assetUseHistoryBOList[i].result == results[0][j]) {
+                data.result.assetUseHistoryBOList[i].result = results[1][j]
+              }
+            }
+          }
           this.history = data.result.assetUseHistoryBOList
-          console.log(data)
         })
     },
     components: {

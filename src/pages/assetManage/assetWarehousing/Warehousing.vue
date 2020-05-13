@@ -3,7 +3,7 @@
     <SubTitle :subTitle="subTitle"/>
     <el-button type="primary"
                style="position: absolute; top: 70px; right: 20px"
-               @click="dialogAssetAdd = true">资产补货</el-button>
+               @click="addNum">资产补货</el-button>
     <el-form ref="warehousing"
              :model="warehousing"
              label-width="80px"
@@ -26,14 +26,26 @@
       <el-form-item label="采购数量">
         <el-input v-model="warehousing.num"></el-input>
       </el-form-item>
+      <el-form-item label="仓库名">
+        <div class="row">
+          <el-select v-model="warehousing.warehouseName">
+            <el-option
+              v-for="item in warehouses"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </div>
+      </el-form-item>
       <el-form-item label="类型">
         <div class="row">
           <el-select v-model="warehousing.type">
             <el-option
               v-for="item in types"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.id"
+              :label="item.typeName"
+              :value="item.id">
             </el-option>
           </el-select>
           <div>没有想要的类型？点击
@@ -49,15 +61,19 @@
         </template>
       </el-form-item>
       <el-form-item label="上传图片">
-        <el-image
-          style="width: 100px; height: 100px"
-          :src="warehousing.pic1"></el-image>
-        <el-image
-          style="width: 100px; height: 100px"
-          :src="warehousing.pic2"></el-image>
-        <el-image
-          style="width: 100px; height: 100px"
-          :src="warehousing.pic3"></el-image>
+        <el-upload
+          action="http://39.105.45.77:8082/asset_manage/file/fileUpload"
+          list-type="picture-card"
+          :headers="fileHeader"
+          auto-upload
+          :on-success="fileSuccess"
+          :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove">
+          <i class="el-icon-plus"></i>
+        </el-upload>
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
       </el-form-item>
       <el-form-item label="备注">
         <el-input type="textarea" v-model="warehousing.remarks"></el-input>
@@ -68,20 +84,20 @@
       </el-form-item>
     </el-form>
     <!--弹框-->
-    <el-dialog title="收货地址"
+    <el-dialog title="资产补货"
                :visible.sync="dialogAssetAdd"
                :modal-append-to-body="false">
       <el-form :model="queryAsset" :inline="true">
         <el-form-item label="资产名" label-width="100">
           <el-input v-model="queryAsset.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-button type="primary"> 查询 </el-button>
+        <el-button type="primary" @click="query">查 询</el-button>
       </el-form>
       <el-table :data="queryList">
         <el-table-column property="id" label="资产ID"></el-table-column>
-        <el-table-column property="name" label="资产名"></el-table-column>
-        <el-table-column property="model" label="型号"></el-table-column>
-        <el-table-column property="own" label="剩余"></el-table-column>
+        <el-table-column property="assetName" label="资产名"></el-table-column>
+        <el-table-column property="version" label="型号"></el-table-column>
+        <el-table-column property="number" label="剩余"></el-table-column>
       </el-table>
       <div class="text-h5 q-pt-md q-pb-lg">您选择的是 1003 订书机   E123</div>
       <div class="row">
@@ -124,11 +140,15 @@
           model: 'E103',
           own: '0'
         }],
+        fileHeader: {},
         needCount: '',
         addType: false,
         warehousing: {},
         typeName: '',
-        types: []
+        types: [],
+        dialogImageUrl: '',
+        dialogVisible: false,
+        warehouses: []
       }
     },
     components: {
@@ -138,12 +158,15 @@
       const self = this
       this.$get('/asset_manage/assetType/assetTypeList')
         .then(data => {
-          data.result.forEach(function (v, i, a) {
-            self.types.push({
-              value: v.id,
-              label: v.typeName
-            })
-          })
+          self.types = data.result
+        })
+      this.fileHeader = {
+        'token': sessionStorage.getItem('token')
+      }
+      this.$get('/asset_manage/warehouse/warehouseList')
+        .then(data => {
+          console.log(data)
+          this.warehouses = data.result
         })
     },
     methods: {
@@ -151,22 +174,65 @@
         this.$post('/asset_manage/asset/addAsset', {
           assetName: this.warehousing.name,
           assetNum: this.warehousing.num,
-          image1: '',
-          image2: '',
-          image3: '',
+          image1: this.warehousing.imgUrl1,
+          image1: this.warehousing.imgUrl2,
+          image3: this.warehousing.imgUrl3,
           life: this.warehousing.age,
           version: this.warehousing.model,
           manufacture: this.warehousing.factory,
           price: this.warehousing.price,
           typeId: this.warehousing.type,
-          useType: this.warehousing.power
+          useType: this.warehousing.power,
+          warehouseId: this.warehousing.warehouseName
         })
           .then(data => console.log(data))
       },
+      query() {
+        this.$get('/asset_manage/asset/assetList', {
+          assetName: this.queryAsset.name
+        })
+          .then(data => {
+            console.log(data)
+            this.queryList = data.result
+          })
+      },
       sureAddType() {
+        const self = this
         this.addType = false
-        this.$post('/asset_manage/assetType/addAssetType', this.typeName)
-          .then(data => console.log(data))
+        this.$post('/asset_manage/assetType/addAssetType', { assetName:this.typeName})
+          .then(() => {
+            this.$get('/asset_manage/assetType/assetTypeList')
+              .then(data => {
+                self.types = data.result
+              })
+          })
+      },
+      fileSuccess(response, file, fileList) {
+        console.log(response, file, fileList);
+        if (fileList.length == 3) {
+          this.warehousing.imgUrl1 = response.result[0]
+          this.warehousing.imgUrl2 = response.result[1]
+          this.warehousing.imgUrl3 = response.result[2]
+        } else if (fileList.length == 2) {
+          this.warehousing.imgUrl1 = response.result[0]
+          this.warehousing.imgUrl2 = response.result[1]
+        } else if (fileList.length == 1) {
+          this.warehousing.imgUrl1 = response.result[0]
+        } else {
+          this.warehousing.imgUrl1 = ''
+          this.warehousing.imgUrl2 = ''
+          this.warehousing.imgUrl3 = ''
+        }
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogVisible = true;
+      },
+      addNum () {
+        this.dialogAssetAdd = true
       }
     }
   }
