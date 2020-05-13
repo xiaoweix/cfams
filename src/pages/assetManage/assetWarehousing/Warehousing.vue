@@ -93,20 +93,20 @@
         </el-form-item>
         <el-button type="primary" @click="query">查 询</el-button>
       </el-form>
-      <el-table :data="queryList">
+      <el-table :data="queryList" highlight-current-row @current-change="handleCurrentChange">
         <el-table-column property="id" label="资产ID"></el-table-column>
         <el-table-column property="assetName" label="资产名"></el-table-column>
         <el-table-column property="version" label="型号"></el-table-column>
-        <el-table-column property="number" label="剩余"></el-table-column>
+        <el-table-column property="assetNum" label="剩余"></el-table-column>
       </el-table>
-      <div class="text-h5 q-pt-md q-pb-lg">您选择的是 1003 订书机   E123</div>
+      <div class="text-h5 q-pt-md q-pb-lg">您选择的是 {{this.id}} {{this.name}} {{this.version}}</div>
       <div class="row">
         <div class="text-h6 q-pr-lg">采购数量</div>
         <el-input v-model="needCount" autocomplete="off" style="width: 100px"></el-input>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogAssetAdd = false">取 消</el-button>
-        <el-button type="primary" @click="dialogAssetAdd = false">确 定</el-button>
+        <el-button type="primary" @click="sure">确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="addType"
@@ -134,21 +134,21 @@
         subTitle: '资产入库',
         dialogAssetAdd: false,
         queryAsset: {},
-        queryList: [{
-          id: '1003',
-          name: '订书机',
-          model: 'E103',
-          own: '0'
-        }],
+        queryList: [],
         fileHeader: {},
-        needCount: '',
+        needCount: 0,
         addType: false,
         warehousing: {},
         typeName: '',
         types: [],
         dialogImageUrl: '',
         dialogVisible: false,
-        warehouses: []
+        warehouses: [],
+        id: 0,
+        name: '',
+        version: '',
+        num: 0,
+        assetNum: 0
       }
     },
     components: {
@@ -233,6 +233,22 @@
       },
       addNum () {
         this.dialogAssetAdd = true
+      },
+      handleCurrentChange(val) {
+        this.currentRow = val;
+        this.id = val.id
+        this.name = val.assetName
+        this.version = val.version
+        this.assetNum = val.assetNum
+      },
+      sure () {
+        this.$post('/asset_manage/asset/modifyAsset', {
+          id: this.id,
+          assetNum: parseInt(this.assetNum) + parseInt(this.needCount)
+        })
+          .then(data => {
+            this.dialogAssetAdd = false
+          })
       }
     }
   }
