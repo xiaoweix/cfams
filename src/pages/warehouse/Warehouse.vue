@@ -30,7 +30,7 @@
         </el-table-column>
         <el-table-column
           prop="name"
-          label="仓库名">
+          label="地图名">
         </el-table-column>
         <el-table-column
           prop="address"

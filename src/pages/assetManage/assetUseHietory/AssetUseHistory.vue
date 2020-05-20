@@ -34,7 +34,7 @@
         <el-table-column
           fixed
           prop="id"
-          label="资产编号"
+          label="申请编号"
           width="120">
         </el-table-column>
         <el-table-column

@@ -16,7 +16,7 @@
           <el-input v-model="addUserForm.password"></el-input>
         </el-form-item>
         <el-form-item label="身份">
-          <el-select v-model="addUserForm.status" placeholder="请选择">
+          <el-select v-model="addUserForm.jobLevel" placeholder="请选择">
             <el-option
               v-for="item in statuses"
               :key="item.value"
@@ -59,11 +59,11 @@
             label: '管理员'
           },
           {
-            value: 4,
+            value: 9,
             label: '超级管理员'
           }
         ],
-        status: ''
+        jobLevel: ''
       }
     },
     components: {
@@ -71,14 +71,14 @@
     },
     methods: {
       addUser () {
-        let { email, password, signature, status, telephone, userName } = this.addUserForm
-        let jobLevels = [['1', '2', '3', '9'], ['普通学生用户', '教师用户', '管理员', '超级管理员']]
-        let jobLevel;
-        for(let i = 0; i < jobLevels[1].length; i++) {
-          if(jobLevel == jobLevels[1][i]) {
-            jobLevel = jobLevels[0][i]
-          }
-        }
+        let { email, password, signature, telephone, userName, jobLevel } = this.addUserForm
+        let jobLevels = [[1, 2, 3, 9], ['普通学生用户', '教师用户', '管理员', '超级管理员']];
+        // for(let i = 0; i < jobLevels[1].length; i++) {
+        //   if(jobLevel == jobLevels[1][i]) {
+        //     jobLevel = jobLevels[0][i]
+        //   }
+        // }
+        console.log(email, password, signature, jobLevel, telephone, userName);
         this.$post('/asset_manage/user/addUser', {
           email, password, signature, jobLevel, telephone, userName
         })
