@@ -102,6 +102,8 @@
             this.formDisabled = true
             if(res.code == 200) {
               this.$q.notify({
+                position: 'top',
+                timeout: 250,
                 color: 'green-4',
                 textColor: 'white',
                 icon: 'cloud_done',

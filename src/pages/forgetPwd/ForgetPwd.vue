@@ -80,6 +80,8 @@ export default {
       })
         .then(() => {
           this.$q.notify({
+            position: 'top',
+            timeout: 250,
             color: 'green-4',
             textColor: 'white',
             icon: 'cloud_done',
@@ -101,6 +103,8 @@ export default {
                 .then(data => {
                   if(data.code == 200) {
                     this.$q.notify({
+                      position: 'top',
+                      timeout: 250,
                       color: 'green-4',
                       textColor: 'white',
                       icon: 'cloud_done',
@@ -108,6 +112,8 @@ export default {
                     })
                   } else {
                     this.$q.notify({
+                      position: 'top',
+                      timeout: 250,
                       color: 'red-4',
                       textColor: 'white',
                       icon: 'cloud_done',
@@ -117,6 +123,8 @@ export default {
                 })
                 .catch(err => {
                   this.$q.notify({
+                    position: 'top',
+                    timeout: 250,
                     color: 'red-4',
                     textColor: 'white',
                     icon: 'cloud_done',
@@ -126,6 +134,8 @@ export default {
             }
             else if (data.code == 500) {
               this.$q.notify({
+                position: 'top',
+                timeout: 250,
                 color: 'red-4',
                 textColor: 'white',
                 icon: 'cloud_done',
@@ -135,6 +145,8 @@ export default {
           })
           .catch(err => {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'red-4',
               textColor: 'white',
               icon: 'cloud_done',

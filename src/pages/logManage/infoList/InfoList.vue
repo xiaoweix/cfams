@@ -76,6 +76,7 @@
           <template slot-scope="scope">
             <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="scope.row.isDeal">同意</el-button>
             <el-button type="text" size="small" @click="handleReject(scope.row, scope.row.isDeal)" :disabled="scope.row.isDeal">拒绝</el-button>
+            <el-button type="text" size="small" @click="handleBack(scope.row, scope.row.isDeal)" :disabled="scope.row.isBrow">归还</el-button>
             <el-button @click="handleView(scope.row)" type="text" size="small">申请详情</el-button>
           </template>
         </el-table-column>
@@ -175,7 +176,7 @@
       },
       getList() {
         let urgencyArr = [['1', '2', '3'], ['不急', '一般', '急用']]
-        let resultArr = [['0', '1', '2'], ['待处理', '同意', '拒绝']]
+        let resultArr = [['0', '1', '2', '3'], ['待处理', '同意', '拒绝', '已归还']]
         let typeArr = [['1', '2', '3', '4', '5'], ['借用', '领用', '使用', '采购', '反馈']]
         this.$get('/asset_manage/apply/assetLogList', {
           assetId: this.queryList.id,
@@ -204,7 +205,13 @@
             }
             this.infoList = data.result;
             for(let i = 0; i < data.result.length; i++) {
-              if(data.result[i].result == '同意' || data.result[i].result == '拒绝') {
+              if (data.result[i].type == '借用' && data.result[i].result == '同意') {
+                console.log(i)
+                data.result[i].isBrow = false;
+              } else {
+                data.result[i].isBrow = true;
+              }
+              if(data.result[i].result == '同意' || data.result[i].result == '拒绝' || data.result[i].result == '已归还') {
                 data.result[i].isDeal = true;
               } else {
                 data.result[i].isDeal = false;
@@ -232,6 +239,8 @@
         })
           .then(data => {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'green-4',
               textColor: 'white',
               icon: 'cloud_done',
@@ -242,9 +251,25 @@
       },
       handleView(row) {
         this.dialogBadVisible = true
-        this.$get('/asset_manage/apply/assetApplyDetail')
+        this.$get('/asset_manage/apply/assetApplyDetail', {id: row.id})
         .then(data => {
           this.detail = data.result
+        })
+      },
+      handleBack(row) {
+        this.$get('/asset_manage/apply/returnAsset', {
+          applyId: row.id
+        })
+        .then(data => {
+          this.getList()
+          this.$q.notify({
+            position: 'top',
+            timeout: 250,
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: '归还成功'
+          })
         })
       }
     }

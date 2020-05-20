@@ -37,9 +37,7 @@
         badNum: '',
         pieData: [],
         xBarData: [],
-        yBarData: [],
-        xLineData: [],
-        yLineData: []
+        yBarData: []
       }
     },
     components: {
@@ -67,20 +65,20 @@
             this.xBarData.push(res.assetLendRankList[i].assetName)
             this.yBarData.push(res.assetLendRankList[i].assetNum)
           }
-          if(res.assetUseHalfYearBOList) {
-            for(let i = 0; i < res.assetUseHalfYearBOList.length; i++) {
-              this.xLineData.push(res.assetUseHalfYearBOList[i].assetName)
-              this.yLineData.push(res.assetUseHalfYearBOList[i].assetNum)
-            }
-            this.drawLine();
-          } else {
-            let halfYearDiv = document.getElementById('halfYearUse')
-            let pDiv = document.getElementById('asset-profile')
-            pDiv.removeChild(halfYearDiv)
-          }
+          // if(res.assetUseHalfYearBOList) {
+          //   for(let i = 0; i < res.assetUseHalfYearBOList.length; i++) {
+          //     this.xLineData.push(res.assetUseHalfYearBOList[i].assetName)
+          //     this.yLineData.push(res.assetUseHalfYearBOList[i].assetNum)
+          //   }
+          //   this.drawLine();
+          // } else {
+          //   let halfYearDiv = document.getElementById('halfYearUse')
+          //   let pDiv = document.getElementById('asset-profile')
+          //   pDiv.removeChild(halfYearDiv)
+          // }
           this.drawPie();
           this.drawBar();
-
+          this.drawLine();
         })
     },
     methods: {
@@ -174,15 +172,14 @@
           },
           xAxis: {
             type: 'category',
-            data: xLineData
+            data: ['2019-11', '2019-12', '2020-01', '2020-02', '2020-03', '2020-04', '2020-05']
           },
           yAxis: {
             type: 'value'
           },
           series: [{
-            data: yLileData,
-            type: 'line',
-            smooth: true
+            data: [20, 32, 26, 10, 20, 28, 30],
+            type: 'line'
           }]
         })
       }

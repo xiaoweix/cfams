@@ -165,7 +165,6 @@
       }
       this.$get('/asset_manage/warehouse/warehouseList')
         .then(data => {
-          console.log(data)
           this.warehouses = data.result
         })
     },
@@ -185,14 +184,12 @@
           useType: this.warehousing.power,
           warehouseId: this.warehousing.warehouseName
         })
-          .then(data => console.log(data))
       },
       query() {
         this.$get('/asset_manage/asset/assetList', {
           assetName: this.queryAsset.name
         })
           .then(data => {
-            console.log(data)
             this.queryList = data.result
           })
       },
@@ -205,6 +202,14 @@
               .then(data => {
                 self.types = data.result
               })
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '添加成功'
+            })
           })
       },
       fileSuccess(response, file, fileList) {
@@ -248,6 +253,14 @@
         })
           .then(data => {
             this.dialogAssetAdd = false
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '修改成功'
+            })
           })
       }
     }

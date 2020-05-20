@@ -22,6 +22,9 @@
     </div>
     <el-table :data="lotLogTable" >
       <el-table-column
+        type="index">
+      </el-table-column>
+      <el-table-column
         prop="userName"
         label="操作人">
       </el-table-column>

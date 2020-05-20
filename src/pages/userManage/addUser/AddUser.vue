@@ -84,6 +84,8 @@
         })
           .then(data => {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'green-4',
               textColor: 'white',
               icon: 'cloud_done',
@@ -92,6 +94,7 @@
           })
           .catch(err => {
             this.$q.notify({
+              position: 'top',
               color: 'red-4',
               textColor: 'white',
               icon: 'cloud_done',

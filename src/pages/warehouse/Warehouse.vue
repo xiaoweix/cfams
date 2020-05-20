@@ -156,7 +156,6 @@
         this.dialogAdd = true
         this.$get('/asset_manage/dataMap/assetMapList')
           .then(data => {
-            console.log(data.result)
             this.maps = data.result
           })
       },
@@ -170,12 +169,29 @@
         this.$get('/asset_manage/warehouse/warehouseList',{assetId: row.id})
           .then(data => {
             this.editRow = data.result[0]
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
           })
       },
       sureEdit() {
         this.dialogEdit = false
         this.$post('/asset_manage/warehouse/modifyWarehouse',{id: this.editId,address: this.editRow.address,name:this.editRow.name})
-          .then(data => console.log(data))
+          .then(data => {
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
+          })
       },
       // 删除
       handleDelete (row) {
@@ -196,6 +212,14 @@
               return this.wareList
             }
           }
+          this.$q.notify({
+            position: 'top',
+            timeout: 250,
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: data.msg
+          })
         })
         this.currentRow = ''
       },
@@ -209,6 +233,14 @@
         })
           .then(data => {
             this.wareList.push(this.addRow)
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
           })
           .catch(err => {
             console.log(err);
@@ -228,7 +260,6 @@
             data.result[i].createTime = this.dateFormat(data.result[i].createTime)
           }
           this.wareList = data.result
-          console.log(this.wareList);
         })
       },
       dateFormat:function(time) {

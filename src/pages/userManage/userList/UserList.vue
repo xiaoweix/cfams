@@ -207,7 +207,7 @@
             label: '管理员'
           },
           {
-            value: '4',
+            value: '9',
             label: '超级管理员'
           }
         ],
@@ -290,6 +290,8 @@
           userId: this.currentRow.id
         }).then(data => {
           this.$q.notify({
+            position: 'top',
+            timeout: 250,
             color: 'green-4',
             textColor: 'white',
             icon: 'cloud_done',
@@ -328,6 +330,14 @@
         this.$get('/asset_manage/user/userDetail', { userId: id, email, jobLevel, password, signature, telephone, userName })
           .then(data => {
             this.queryUserList()
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
           })
       },
       handleSizeChange(val) {
@@ -389,6 +399,14 @@
           this.$get('/asset_manage/user/userDetail', { userId: id })
            .then(data => {
              this.applyUser = data.result
+             this.$q.notify({
+               position: 'top',
+               timeout: 250,
+               color: 'green-4',
+               textColor: 'white',
+               icon: 'cloud_done',
+               message: data.msg
+             })
            })
         }
         if (status == 1 || status == 2) {
@@ -398,6 +416,14 @@
           })
             .then(data => {
               this.queryUserList()
+              this.$q.notify({
+                position: 'top',
+                timeout: 250,
+                color: 'green-4',
+                textColor: 'white',
+                icon: 'cloud_done',
+                message: data.msg
+              })
             })
         }
       },
@@ -407,6 +433,14 @@
         })
           .then(data => {
             this.queryUserList()
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
           })
       },
       notApply () {
@@ -415,6 +449,14 @@
         })
           .then(data => {
             this.queryUserList()
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: data.msg
+            })
           })
       },
       handleView (row) {

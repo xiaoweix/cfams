@@ -71,6 +71,8 @@ export default {
               userCode: this.userCode
             })
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'green-4',
               textColor: 'white',
               icon: 'cloud_done',
@@ -79,6 +81,8 @@ export default {
           }
           else if(res.code == 500) {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'red-4',
               textColor: 'white',
               icon: 'cloud_done',
@@ -88,6 +92,8 @@ export default {
         })
         .catch(err =>  {
           this.$q.notify({
+            position: 'top',
+            timeout: 250,
             color: 'red-4',
             textColor: 'white',
             icon: 'cloud_done',

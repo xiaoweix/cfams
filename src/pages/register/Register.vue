@@ -97,6 +97,8 @@
                 .then(data => {
                   if(data.code == 200) {
                     this.$q.notify({
+                      position: 'top',
+                      timeout: 250,
                       color: 'green-4',
                       textColor: 'white',
                       icon: 'cloud_done',
@@ -104,6 +106,8 @@
                     })
                   } else {
                     this.$q.notify({
+                      position: 'top',
+                      timeout: 250,
                       color: 'red-4',
                       textColor: 'white',
                       icon: 'cloud_done',
@@ -113,6 +117,8 @@
                 })
                 .catch(err => {
                   this.$q.notify({
+                    position: 'top',
+                    timeout: 250,
                     color: 'red-4',
                     textColor: 'white',
                     icon: 'cloud_done',
@@ -122,19 +128,23 @@
             }
             else if (data.code == 500) {
               this.$q.notify({
+                position: 'top',
+                timeout: 250,
                 color: 'red-4',
                 textColor: 'white',
                 icon: 'cloud_done',
-                message: '验证码错误'
+                message: "验证码错误"
               })
             }
           })
           .catch(err => {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'red-4',
               textColor: 'white',
               icon: 'cloud_done',
-              message: '服务器繁忙，稍后再试'
+              message: "服务器繁忙，稍后再试"
             })
           })
       },
@@ -144,10 +154,12 @@
         })
           .then(() => {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'green-4',
               textColor: 'white',
               icon: 'cloud_done',
-              message: '发送成功'
+              message: "发送成功"
             })
           })
       }

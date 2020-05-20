@@ -70,8 +70,8 @@
           <template slot-scope="scope">
             <el-button @click="handleUse(scope.row)" type="text" size="small">详情</el-button>
             <el-button type="text" size="small" @click="handleBorrow(scope.row)" :disabled="scope.row.isD">借用</el-button>
-            <el-button @click="handleEmploy(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}">使用</el-button>
-            <el-button @click="handleReceive(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}" :disabled="scope.row.isD">申领</el-button>
+            <el-button @click="handleEmploy(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}" :disabled="scope.row.isU">使用</el-button>
+            <el-button @click="handleReceive(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}" :disabled="scope.row.isA">申领</el-button>
             <el-button type="text" size="small" @click="handleBad(scope.row)">反馈</el-button>
           </template>
         </el-table-column>
@@ -413,6 +413,8 @@
           .then((data) => {
             if(data.code == 200) {
               this.$q.notify({
+                position: 'top',
+                timeout: 250,
                 color: 'green-4',
                 textColor: 'white',
                 icon: 'cloud_done',
@@ -441,6 +443,8 @@
         .then((data) => {
           if(data.code == 200) {
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'green-4',
               textColor: 'white',
               icon: 'cloud_done',
@@ -467,7 +471,16 @@
           number: this.assetReceive.number,
           type: 2,
         })
-          .then(data => console.log(data))
+          .then(data => {
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '提交成功'
+            })
+          })
       },
 
       // 详情
@@ -477,6 +490,14 @@
         this.$get('/asset_manage/asset/assetDetail', {id: asset.id})
         .then(data => {
           this.assetUse = data.result
+          this.$q.notify({
+            position: 'top',
+            timeout: 250,
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: '提交成功'
+          })
         })
         .catch(err => console.log(err))
       },
@@ -499,7 +520,16 @@
           image3: this.assetApply.imgUrl3,
           type: 4,
         })
-          .then(data => console.log(data))
+          .then(data => {
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '提交成功'
+            })
+          })
       },
       // 反馈
       handleBad(asset) {
@@ -520,7 +550,16 @@
           image3: this.assetBad.imgUrl3,
           type: 5,
         })
-          .then(data => console.log(data))
+          .then(data => {
+            this.$q.notify({
+              position: 'top',
+              timeout: 250,
+              color: 'green-4',
+              textColor: 'white',
+              icon: 'cloud_done',
+              message: '提交成功'
+            })
+          })
       },
       // 我的图片上传
       fileSuccess(response, file, fileList) {
@@ -542,7 +581,8 @@
       },
 
       getList() {
-        let statusArr = [['0', '1', '2', '3', '4'], ['空闲', '借用中', '使用中', '维修中', '报废']]
+        let useTypeArr = [['0', '1', '2'], ['借用', '领用', '使用']]
+        let statusArr = [['0', '1', '2', '3', '4', '5'], ['空闲中', '借用中', '使用中', '维修中', '报废']]
         let myStatus = this.queryList.status
         for (let i = 0; i < statusArr[0].length; i++) {
           if (myStatus == statusArr[1][i]) {
@@ -558,11 +598,27 @@
           status: myStatus
         })
           .then(data => {
+            for (let i = 0; i < data.result.length; i++) {
+              if (data.result[i].useType == 0 && data.result[i].status == 0) {
+                data.result[i].isD = false
+                data.result[i].isU = true
+                data.result[i].isA = true
+              } else if (data.result[i].useType == 1 && data.result[i].status == 0) {
+                data.result[i].isD = true
+                data.result[i].isU = true
+                data.result[i].isA = false
+              } else if (data.result[i].useType == 2 && data.result[i].status == 0) {
+                data.result[i].isD = true
+                data.result[i].isU = false
+                data.result[i].isA = true
+              } else {
+                data.result[i].isD = true
+                data.result[i].isU = true
+                data.result[i].isA = true
+              }
+          }
             for(let j = 0; j < statusArr[0].length; j++) {
               for (let i = 0; i < data.result.length; i++) {
-                if (data.result[i].status == 1) {
-                  data.result[i].isD = true
-                }
                 if (data.result[i].status == statusArr[0][j]) {
                   data.result[i].status = statusArr[1][j]
                 }
