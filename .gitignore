@@ -6,6 +6,7 @@ node_modules
 .quasar
 /dist
 /backend
+/upload-img
 
 # Cordova related directories and files
 /src-cordova/node_modules

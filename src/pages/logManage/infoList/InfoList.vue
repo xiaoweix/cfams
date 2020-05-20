@@ -253,7 +253,20 @@
         this.dialogBadVisible = true
         this.$get('/asset_manage/apply/assetApplyDetail', {id: row.id})
         .then(data => {
+          let imgLen;
           this.detail = data.result
+          if (data.result.image3 == null) {
+            imgLen = 2
+            if (data.result.image2 == null) {
+              imgLen = 1
+              if (data.result.image1 == null) {
+                imgLen = 0
+              }
+            }
+          }
+          for(let i = 0; i < imgLen; i++) {
+            console.log('渲染图片');
+          }
         })
       },
       handleBack(row) {

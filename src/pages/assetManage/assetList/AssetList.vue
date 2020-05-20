@@ -216,7 +216,7 @@
         </el-form-item>
         <el-form-item label="损坏图片">
           <el-upload
-            action="http://39.105.45.77:8082/asset_manage/file/fileUpload"
+            action="http://127.0.0.1:8092/asset_manage/file/fileUpload"
             list-type="picture-card"
             :headers="fileHeader"
             auto-upload
@@ -267,7 +267,7 @@
         </el-form-item>
         <el-form-item label="资源图片">
           <el-upload
-            action="http://39.105.45.77:8082/asset_manage/file/fileUpload"
+            action="http://127.0.0.1:8092/asset_manage/file/fileUpload"
             list-type="picture-card"
             :headers="fileHeader"
             auto-upload
@@ -581,7 +581,7 @@
       },
 
       getList() {
-        let useTypeArr = [['0', '1', '2'], ['借用', '领用', '使用']]
+        let useTypeArr = [['1', '2', '3'], ['借用', '领用', '使用']]
         let statusArr = [['0', '1', '2', '3', '4', '5'], ['空闲中', '借用中', '使用中', '维修中', '报废']]
         let myStatus = this.queryList.status
         for (let i = 0; i < statusArr[0].length; i++) {
@@ -599,15 +599,15 @@
         })
           .then(data => {
             for (let i = 0; i < data.result.length; i++) {
-              if (data.result[i].useType == 0 && data.result[i].status == 0) {
+              if (data.result[i].useType == 1 && data.result[i].status == 0) {
                 data.result[i].isD = false
                 data.result[i].isU = true
                 data.result[i].isA = true
-              } else if (data.result[i].useType == 1 && data.result[i].status == 0) {
+              } else if (data.result[i].useType == 2 && data.result[i].status == 0) {
                 data.result[i].isD = true
                 data.result[i].isU = true
                 data.result[i].isA = false
-              } else if (data.result[i].useType == 2 && data.result[i].status == 0) {
+              } else if (data.result[i].useType == 3 && data.result[i].status == 0) {
                 data.result[i].isD = true
                 data.result[i].isU = false
                 data.result[i].isA = true
