@@ -490,14 +490,6 @@
         this.$get('/asset_manage/asset/assetDetail', {id: asset.id})
         .then(data => {
           this.assetUse = data.result
-          this.$q.notify({
-            position: 'top',
-            timeout: 250,
-            color: 'green-4',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: '提交成功'
-          })
         })
         .catch(err => console.log(err))
       },

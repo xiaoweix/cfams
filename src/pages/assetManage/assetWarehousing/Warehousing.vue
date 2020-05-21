@@ -184,6 +184,16 @@
           useType: this.warehousing.power,
           warehouseId: this.warehousing.warehouseName
         })
+        .then(data => {
+          this.$q.notify({
+            position: 'top',
+            timeout: 250,
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'cloud_done',
+            message: '添加成功'
+          })
+        })
       },
       query() {
         this.$get('/asset_manage/asset/assetList', {
@@ -196,7 +206,8 @@
       sureAddType() {
         const self = this
         this.addType = false
-        this.$post('/asset_manage/assetType/addAssetType', { assetName:this.typeName})
+        console.log(this.typeName)
+        this.$post('/asset_manage/assetType/addAssetType', { typeName:this.typeName})
           .then(() => {
             this.$get('/asset_manage/assetType/assetTypeList')
               .then(data => {

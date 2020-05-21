@@ -44,20 +44,7 @@
     },
     created() {
       const statusFlag = sessionStorage.getItem("userCode")
-      if (statusFlag == 0) {
-        this.menu = [
-          {
-            label: '首页'
-          },
-          {
-            label: '资产列表'
-          },
-          {
-            label: '个人中心'
-          },
-          {label: '资产地图'}
-        ]
-      } else if (statusFlag == 1) {
+      if (statusFlag == 1) {
         this.menu = [
           {
             label: '首页'
@@ -71,12 +58,18 @@
           {label: '资产地图'}
         ]
       } else if (statusFlag == 2) {
-        this.$q.notify({
-          color: 'red-4',
-          textColor: 'white',
-          icon: 'cloud_done',
-          message: '维修人员登录成功，尚未初始化左侧列表'
-        })
+        this.menu = [
+          {
+            label: '首页'
+          },
+          {
+            label: '资产列表'
+          },
+          {
+            label: '个人中心'
+          },
+          {label: '资产地图'}
+        ]
       } else if (statusFlag == 3) {
         this.menu = [
           {

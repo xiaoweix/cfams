@@ -92,6 +92,15 @@
         <el-form-item label="资产型号">
           <el-input v-model="detail.assetVersion" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="资产图">
+          <el class="row">
+            <div class="col-4" v-for="(item,i) in imgs">
+              <q-img
+                :src="imgs[i]"
+              />
+            </div>
+          </el>
+        </el-form-item>
         <el-form-item label="使用地点">
           <el-input v-model="detail.address" autocomplete="off"></el-input>
         </el-form-item>
@@ -161,7 +170,8 @@
           }
         ],
         queryList: {},
-        isDeal: false
+        isDeal: false,
+        imgs: []
       }
     },
     components: {
@@ -220,11 +230,15 @@
           })
       },
       handleAgree(row) {
+        this.getList()
         this.$get('/asset_manage/apply/agreeApply', {
           applyId: row.id
         })
           .then(data => {
+            this.getList()
             this.$q.notify({
+              position: 'top',
+              timeout: 250,
               color: 'green-4',
               textColor: 'white',
               icon: 'cloud_done',
@@ -238,6 +252,7 @@
           applyId: row.id
         })
           .then(data => {
+            this.getList()
             this.$q.notify({
               position: 'top',
               timeout: 250,
@@ -250,22 +265,17 @@
           })
       },
       handleView(row) {
+        const self = this
         this.dialogBadVisible = true
         this.$get('/asset_manage/apply/assetApplyDetail', {id: row.id})
         .then(data => {
-          let imgLen;
           this.detail = data.result
-          if (data.result.image3 == null) {
-            imgLen = 2
-            if (data.result.image2 == null) {
-              imgLen = 1
-              if (data.result.image1 == null) {
-                imgLen = 0
-              }
-            }
-          }
-          for(let i = 0; i < imgLen; i++) {
-            console.log('渲染图片');
+          if (data.result.image3) {
+            self.imgs = ["file://" + data.result.image1, "file://" + data.result.image2, "file://" + data.result.image3]
+          } else if(data.result.image2){
+            self.imgs = ["file://" + data.result.image1, "file://" + data.result.image2]
+          } else if (data.result.image1) {
+            self.imgs = ["file://" + data.result.image1]
           }
         })
       },
