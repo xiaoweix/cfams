@@ -427,9 +427,9 @@
             })
         }
       },
-      passApply () {
-        this.$post('/asset_manage/user/modifyUser', {
-          id, status: 2
+      passApply (row) {
+        this.$get('/asset_manage/user/agreeUser', {
+          id: row.id
         })
           .then(data => {
             this.queryUserList()
@@ -444,8 +444,8 @@
           })
       },
       notApply () {
-        this.$post('/asset_manage/user/modifyUser', {
-          id, status: 1
+        this.$get('/asset_manage/user/disagreeUser', {
+          id: row.id
         })
           .then(data => {
             this.queryUserList()
