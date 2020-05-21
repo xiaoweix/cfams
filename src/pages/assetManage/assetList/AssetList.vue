@@ -21,7 +21,7 @@
         <el-form-item label="状态">
           <el-select v-model="queryList.status">
             <el-option label="" value=""></el-option>
-            <el-option label="空闲" value="空闲"></el-option>
+            <el-option label="空闲" value="0"></el-option>
             <el-option label="使用中" value="使用中"></el-option>
             <el-option label="借用中" value="借用中"></el-option>
             <el-option label="维修中" value="维修中"></el-option>
@@ -70,7 +70,7 @@
           <template slot-scope="scope">
             <el-button @click="handleUse(scope.row)" type="text" size="small">详情</el-button>
             <el-button type="text" size="small" @click="handleBorrow(scope.row)" :disabled="scope.row.isD">借用</el-button>
-            <el-button @click="handleEmploy(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}" :disabled="scope.row.isU">使用</el-button>
+            <el-button @click="handleEmploy(scope.row)" type="text" size="small" :disabled="scope.row.isU">使用</el-button>
             <el-button @click="handleReceive(scope.row)" type="text" size="small" :style="{display: isShowApply ? 'inline-block': 'none'}" :disabled="scope.row.isA">申领</el-button>
             <el-button type="text" size="small" @click="handleBad(scope.row)">反馈</el-button>
           </template>

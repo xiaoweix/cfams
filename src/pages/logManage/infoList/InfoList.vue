@@ -92,15 +92,15 @@
         <el-form-item label="资产型号">
           <el-input v-model="detail.assetVersion" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="资产图">
-          <el class="row">
-            <div class="col-4" v-for="(item,i) in imgs">
-              <q-img
-                :src="imgs[i]"
-              />
-            </div>
-          </el>
-        </el-form-item>
+<!--        <el-form-item label="资产图">-->
+<!--          <el class="row">-->
+<!--            <div class="col-4" v-for="(item,i) in imgs">-->
+<!--              <q-img-->
+<!--                :src="imgs[i]"-->
+<!--              />-->
+<!--            </div>-->
+<!--          </el>-->
+<!--        </el-form-item>-->
         <el-form-item label="使用地点">
           <el-input v-model="detail.address" autocomplete="off"></el-input>
         </el-form-item>
@@ -270,13 +270,13 @@
         this.$get('/asset_manage/apply/assetApplyDetail', {id: row.id})
         .then(data => {
           this.detail = data.result
-          if (data.result.image3) {
-            self.imgs = ["file://" + data.result.image1, "file://" + data.result.image2, "file://" + data.result.image3]
-          } else if(data.result.image2){
-            self.imgs = ["file://" + data.result.image1, "file://" + data.result.image2]
-          } else if (data.result.image1) {
-            self.imgs = ["file://" + data.result.image1]
-          }
+          // if (data.result.image3) {
+          //   self.imgs = ["file://" + data.result.image1, "file://" + data.result.image2, "file://" + data.result.image3]
+          // } else if(data.result.image2){
+          //   self.imgs = ["file://" + data.result.image1, "file://" + data.result.image2]
+          // } else if (data.result.image1) {
+          //   self.imgs = ["file://" + data.result.image1]
+          // }
         })
       },
       handleBack(row) {
