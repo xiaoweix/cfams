@@ -60,6 +60,11 @@
           width="140">
         </el-table-column>
         <el-table-column
+          prop="assetNum"
+          label="资产数量"
+          width="80">
+        </el-table-column>
+        <el-table-column
           prop="warehouseName"
           label="仓库"
           width="180">
@@ -180,6 +185,16 @@
         </el-form-item>
         <el-form-item label="使用地点">
           <el-input v-model="assetEmploy.address" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="资产地图">
+          <el-select v-model="assetEmploy.mapId" placeholder="请选择">
+            <el-option
+              v-for="item in maps"
+              :key="item.id"
+              :label="item.mapName"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="assetEmploy.remarks"
@@ -344,6 +359,7 @@
         dialogBadVisible: false,
         dialogApplyVisible: false,
         dialogUseVisible: false,
+        maps: [],
         queryList: {
           id: '',
           warehouse: '',
@@ -375,6 +391,10 @@
     },
     created() {
       this.getList()
+      this.$get('/asset_manage/dataMap/assetMapList')
+        .then(data => {
+          this.maps = data.result
+        })
       this.fileHeader = {
         'token': sessionStorage.getItem('token')
       }
@@ -404,10 +424,10 @@
       sureEmploy() {
         this.dialogEmploy = false
         this.$post('/asset_manage/apply/postApply', {
-          address: this.assetEmploy.address,
-          assetId: this.assetEmploy.id,
+          assetId: this.employId,
           version: this.assetEmploy.model,
           remarks: this.assetEmploy.remarks,
+          mapId: this.assetEmploy.mapId,
           type: 3,
         })
           .then((data) => {

@@ -67,7 +67,7 @@
     <el-dialog :modal-append-to-body="false"
                width="40%"
                :visible.sync="dialogView"
-               title="资产使用详情">
+               title="资产申请详情">
       <el-form :model="assetDetail" label-width="120px" disabled>
         <el-form-item label="资产名">
           <el-input v-model="assetDetail.assetName"></el-input>
@@ -107,12 +107,12 @@
     name: "AssetUseHistory",
     data() {
       return {
-    subTitle: '资产使用历史',
-    dialogView: false,
-    queryList: {},
-    assetList: [],
-    assetDetail: {}
-  }
+        subTitle: '资产使用历史',
+        dialogView: false,
+        queryList: {},
+        assetList: [],
+        assetDetail: {}
+      }
   },
     created() {
       this.getList()
@@ -124,15 +124,13 @@
       onSubmit() {
         this.getList()
       },
-      handleView(asset) {
+      handleView(row) {
         this.dialogView = true
-        this.$get('/asset_manage/apply/assetApplyDetail')
+        this.$get('/asset_manage/apply/assetApplyDetail', {
+          id: row.id
+        })
         .then(data => {
           this.assetDetail = data.result
-          for(let i = 0; i < data.result.length; i++) {
-            data.result[i].startTime = this.dateFormat(data.result[i].startTime)
-            data.result[i].endTime = this.dateFormat(data.result[i].endTime)
-          }
         })
       },
       getList() {

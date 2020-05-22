@@ -3,7 +3,7 @@ import axios from 'axios'
 axios.defaults.timeout = 60000
 // axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.baseURL = 'http://39.105.45.77:8082'
-// axios.defaults.baseURL = 'http://127.0.0.1:8082'
+// axios.defaults.baseURL = 'http://127.0.0.1:8092'
 // axios.defaults.baseURL = '/api'
 
 // token

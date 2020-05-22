@@ -55,6 +55,7 @@ export default {
   methods: {
     ...mapMutations(['changeLogin']),
     onLogin() {
+      const self = this;
       const email = this.account
       const password = this.password
       this.$get('/login', { email,password })
@@ -78,6 +79,9 @@ export default {
               icon: 'cloud_done',
               message: '登录成功'
             })
+            setTimeout(function () {
+              self.$router.push('/login')
+            },5000);
           }
           else if(res.code == 500) {
             this.$q.notify({

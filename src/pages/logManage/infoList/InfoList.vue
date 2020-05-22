@@ -92,15 +92,6 @@
         <el-form-item label="资产型号">
           <el-input v-model="detail.assetVersion" autocomplete="off"></el-input>
         </el-form-item>
-<!--        <el-form-item label="资产图">-->
-<!--          <el class="row">-->
-<!--            <div class="col-4" v-for="(item,i) in imgs">-->
-<!--              <q-img-->
-<!--                :src="imgs[i]"-->
-<!--              />-->
-<!--            </div>-->
-<!--          </el>-->
-<!--        </el-form-item>-->
         <el-form-item label="使用地点">
           <el-input v-model="detail.address" autocomplete="off"></el-input>
         </el-form-item>

@@ -111,8 +111,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="passApply()">通过申请</el-button>
-        <el-button @click="notApply()">拒绝申请</el-button>
+        <el-button type="primary" @click="passApply(userId)">通过申请</el-button>
+        <el-button @click="notApply(userId)">拒绝申请</el-button>
       </span>
     </el-dialog>
     <!--资料详情-->
@@ -233,6 +233,7 @@
           status: ''
         },
         userList: [],
+        userId: 1,
         deleteId: '',
         currentPage: 1,
         isSysAdmin: true,
@@ -340,9 +341,6 @@
             })
           })
       },
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
-      },
       handleCurrentChange(val) {
         console.log(`当前页: ${val}`);
       },
@@ -389,6 +387,7 @@
           })
       },
       changeStatus(row) {
+        this.userId = row.id
         let { status, id } = row
         if (status == '正常') {
           status = 1
@@ -427,12 +426,13 @@
             })
         }
       },
-      passApply (row) {
+      passApply (userId) {
         this.$get('/asset_manage/user/agreeUser', {
-          id: row.id
+          userId: this.userId
         })
           .then(data => {
             this.queryUserList()
+            this.dialogDeal = false
             this.$q.notify({
               position: 'top',
               timeout: 250,
@@ -443,11 +443,12 @@
             })
           })
       },
-      notApply () {
+      notApply (row) {
         this.$get('/asset_manage/user/disagreeUser', {
-          id: row.id
+          userId: this.userId
         })
           .then(data => {
+            this.dialogDeal = false
             this.queryUserList()
             this.$q.notify({
               position: 'top',

@@ -102,7 +102,7 @@
                       color: 'green-4',
                       textColor: 'white',
                       icon: 'cloud_done',
-                      message: data.msg
+                      message: data.msg + ",即将跳转注册页面"
                     })
                   } else {
                     this.$q.notify({
