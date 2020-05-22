@@ -104,6 +104,9 @@
                       icon: 'cloud_done',
                       message: data.msg + ",即将跳转注册页面"
                     })
+                    setTimeout(function () {
+                      self.$router.push('/login')
+                    },5000);
                   } else {
                     this.$q.notify({
                       position: 'top',

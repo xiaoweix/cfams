@@ -311,7 +311,7 @@
     <el-dialog title="资产详情"
                :modal-append-to-body="false"
                :visible.sync="dialogUseVisible">
-      <el-form :model="assetUse" label-width="100px" disabled="true">
+      <el-form :model="assetUse" label-width="100px" :disabled="detail">
         <el-form-item label="资产名">
           <el-input v-model="assetUse.assetName" autocomplete="off"></el-input>
         </el-form-item>
@@ -325,7 +325,7 @@
           <el-input v-model="assetUse.price" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="资源类型">
-          <el-input v-model="assetUse.status" autocomplete="off"></el-input>
+          <el-input v-model="assetUse.useType" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="购买日期">
           <el-input v-model="assetUse.purchaseDate" autocomplete="off"></el-input>
@@ -354,6 +354,7 @@
     data() {
       return {
         subTitle: '资产列表',
+        detail: true,
         dialogBorrowVisible: false,
         dialogReceiveVisible: false,
         dialogBadVisible: false,
@@ -505,10 +506,16 @@
 
       // 详情
       handleUse(asset) {
+        let useTypeArr = [['1', '2', '3'], ['借用', '领用', '使用']]
         this.dialogUseVisible = true
         this.assetUse.name = asset.assetName
         this.$get('/asset_manage/asset/assetDetail', {id: asset.id})
         .then(data => {
+          for (let i = 0; i < useTypeArr[0].length; i++) {
+            if (data.result.useType == useTypeArr[0][i]) {
+              data.result.useType = useTypeArr[1][i]
+            }
+          }
           this.assetUse = data.result
         })
         .catch(err => console.log(err))
