@@ -34,27 +34,33 @@
         <el-table-column
           fixed
           prop="id"
+          align="center"
           label="申请编号"
           width="120">
         </el-table-column>
         <el-table-column
           prop="assetName"
+          align="center"
           label="资产名">
         </el-table-column>
         <el-table-column
           prop="userName"
+          align="center"
           label="使用人">
         </el-table-column>
         <el-table-column
           prop="startTime"
+          align="center"
           label="开始时间">
         </el-table-column>
         <el-table-column
           prop="applyType"
+          align="center"
           label="类型">
         </el-table-column>
         <el-table-column
           fixed="right"
+          align="center"
           label="操作"
           width="180">
           <template slot-scope="scope">

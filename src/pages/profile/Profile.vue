@@ -23,24 +23,30 @@
           style="width: 100%">
           <el-table-column
             prop="id"
+            align="center"
             label="申请编号"
             width="180">
           </el-table-column>
           <el-table-column
             prop="assetName"
+            align="center"
             label="资产名"
             width="180">
           </el-table-column>
           <el-table-column
             prop="applyType"
+            align="center"
             label="使用方式">
           </el-table-column>
           <el-table-column
             prop="startTime"
-            label="使用时间">
+            align="center"
+            label="使用时间"
+            width="210">
           </el-table-column>
           <el-table-column
             prop="result"
+            align="center"
             label="使用状态">
           </el-table-column>
         </el-table>

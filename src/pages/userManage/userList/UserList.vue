@@ -40,34 +40,39 @@
     <div class="user-list">
       <el-table :data="userList" >
         <el-table-column
-          label="id"
-          prop="id">
+          align="center"
+          prop="id"
+          width="50">
         </el-table-column>
         <el-table-column
           prop="userName"
+          align="center"
           label="姓名">
         </el-table-column>
         <el-table-column
           prop="email"
+          align="center"
           label="邮箱">
         </el-table-column>
         <el-table-column
           prop="telephone"
+          align="center"
           label="电话">
         </el-table-column>
         <el-table-column
           prop="jobLevel"
+          align="center"
           label="级别">
         </el-table-column>
         <el-table-column
-          label="状态">
+          label="状态" align="center">
           <template slot-scope="scope">
             <el-button @click="changeStatus(scope.row)" type="text" size="small">{{scope.row.status}}</el-button>
           </template>
         </el-table-column>
         <el-table-column
           prop="count"
-          label="操作">
+          label="操作" align="center">
           <template slot-scope="scope">
             <el-button @click="handleEdit(scope.row)" type="text" size="small" :style="{ display: isSysAdmin ? 'inline-block':'none' }">编辑</el-button>
             <el-button type="text" size="small" @click="handleDelete(scope.row, scope.$index, userList)" :style="{ display: isSysAdmin ? 'inline-block':'none' }">删除</el-button>

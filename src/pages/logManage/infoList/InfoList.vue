@@ -41,38 +41,49 @@
       <el-table :data="infoList" >
         <el-table-column
           prop="id"
-          label="申请ID">
+          label="申请ID"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="assetId"
-          label="资产编号">
+          width="80"
+          label="资产编号"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="userName"
-          label="申请人">
+          label="申请人"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="type"
+          align="center"
           label="申请类型">
         </el-table-column>
         <el-table-column
           prop="assetName"
-          label="资产名称">
+          label="资产名称"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="number"
-          label="申请数量">
+          label="申请数量"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="startTime"
-          label="申请时间">
+          width="210"
+          label="申请时间"
+          align="center">
         </el-table-column>
         <el-table-column
           prop="result"
-          label="状态">
+          label="状态"
+          align="center">
         </el-table-column>
         <el-table-column
-          label="操作">
+          label="操作"
+          align="center">
           <template slot-scope="scope">
             <el-button @click="handleAgree(scope.row, scope.row.isDeal)" type="text" size="small" :disabled="scope.row.isDeal">同意</el-button>
             <el-button type="text" size="small" @click="handleReject(scope.row, scope.row.isDeal)" :disabled="scope.row.isDeal">拒绝</el-button>

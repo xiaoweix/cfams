@@ -41,36 +41,43 @@
         <el-table-column
           fixed
           prop="id"
+          align="center"
           label="资产编号"
           width="100">
         </el-table-column>
         <el-table-column
           prop="assetName"
           label="资产名"
+          align="center"
           width="160">
         </el-table-column>
         <el-table-column
           prop="version"
           label="资产类型"
+          align="center"
           width="140">
         </el-table-column>
         <el-table-column
           prop="status"
           label="资产状态"
+          align="center"
           width="140">
         </el-table-column>
         <el-table-column
           prop="assetNum"
           label="资产数量"
+          align="center"
           width="80">
         </el-table-column>
         <el-table-column
           prop="warehouseName"
           label="仓库"
+          align="center"
           width="180">
         </el-table-column>
         <el-table-column
           fixed="right"
+          align="center"
           label="操作">
           <template slot-scope="scope">
             <el-button @click="handleUse(scope.row)" type="text" size="small">详情</el-button>

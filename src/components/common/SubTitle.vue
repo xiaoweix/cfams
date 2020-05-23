@@ -21,4 +21,5 @@
   padding: 10px 0
 .q-separator
   background: #aaa
+  margin-bottom: 10px
 </style>

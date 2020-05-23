@@ -22,19 +22,23 @@
     </div>
     <el-table :data="lotLogTable" >
       <el-table-column
-        type="index">
+        type="index"
+        align="center">
       </el-table-column>
       <el-table-column
         prop="userName"
-        label="操作人">
+        label="操作人"
+        align="center">
       </el-table-column>
       <el-table-column
         prop="remarks"
-        label="操作内容">
+        label="操作内容"
+        align="center">
       </el-table-column>
       <el-table-column
         prop="startTime"
-        label="操作时间">
+        label="操作时间"
+        align="center">
       </el-table-column>
     </el-table>
   </div>
